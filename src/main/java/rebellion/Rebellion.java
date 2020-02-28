@@ -1,32 +1,162 @@
 package rebellion;
 
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class Rebellion {
     private int supporters = 0;
     private int treasury = 0;
     private int population = 0;
-    private String rebellionName = "Kintaro";
+    private String rebellionName = "Kintargo";
     private int notoriety;
     private int rebellionMaxLevel;
     private int members;
+    private int dangerRating = 20;
+    private Focus focus = Focus.NONE;
+
+    private int demagogueConOrChaBonus;
+    private int partisanStrOrWisBonus;
+    private int recruiterLvlBonus;
+    private int sentinelConOrChaBonus;
+    private int sentinelStrOrWisBonus;
+    private int sentinelDexOrIntBonus;
+    private int spymasterDexOrIntBonus;
+    private boolean hasStrategist;
+
+    private int loyaltyOther;
+    private int secrecyOther;
+    private int securityOther;
 
     public String getSheet() {
-        return new StringBuilder()
-                .append("Rebellion Rank: ").append(getRebellionRank()).append("\n")
-                .append("Rebellion Max Level: ").append(getRebellionMaxLevel()).append("\n")
-                .append("Rebellion Members: " + getMembers() + "\n")
-                .append("Rebellion Supporters: " + getRebellionSupporters() + "\n")
-                .append(getRebellion() + " Population: " + getPopulation() + "\n")
-                .append("Rebellion Treasury: " + getTreasury() + "\n")
-                .append("Rebellion Min Treasury: " + getMinTreasury() + "\n")
-                .append("Notoriety: " + getNotoriety() + "\n")
-                .append("Rebellion Actions: " + getActions() + "\n")
-                .append("Max Teams: " + getMaxTeams() + "\n")
-                .append("Teams Available TBD: " + getAvailableTeams() + "\n")
-                .append("Available Actions TBD: " + getAvailableActions() + "\n")
-                .append("Focused Check Bonus: " + getFocusCheckBonus() + "\n")
-                .append("Secondary Check Bonus: " + getSecondaryCheckBonus() + "\n").toString();
+        return "Rebellion Rank: " + getRebellionRank() + "\n" +
+                "Rebellion Max Level: " + getRebellionMaxLevel() + "\n" +
+                "Rebellion Members: " + getMembers() + "\n" +
+                "Rebellion Supporters: " + getRebellionSupporters() + "\n" +
+                getRebellion() + " Population: " + getPopulation() + "\n" +
+                "Rebellion Treasury: " + getTreasury() + "\n" +
+                "Rebellion Min Treasury: " + getMinTreasury() + "\n" +
+                "Notoriety: " + getNotoriety() + "\n" +
+                "Rebellion Actions: " + getActions() + "\n" +
+                "Max Teams: " + getMaxTeams() + "\n" +
+                "Teams Available TBD: " + getAvailableTeams() + "\n" +
+                "Available Actions TBD: " + getAvailableActions() + "\n" +
+                "Focus: " + getFocus() + "\n" +
+                "Loyalty Bonus: " + getLoyaltyBonus() + "\n" +
+                "Secrecy Bonus: " + getSecrecyBonus() + "\n" +
+                "Security Bonus: " + getSecurityBonus() + "\n" +
+                "Danger Rating: " + getDangerRating() + "\n";
+    }
+
+
+
+
+    public void setDemagogue(List<String> attributes){
+        if(attributes.isEmpty()){
+            demagogueConOrChaBonus = 0;
+        }else if(attributes.size() == 1){
+            demagogueConOrChaBonus = Integer.parseInt(attributes.get(0));
+        }else if(attributes.size() == 2){
+            demagogueConOrChaBonus = Math.max(Integer.parseInt(attributes.get(0)),Integer.parseInt(attributes.get(1)));
+        }else if(attributes.size() == 6){
+            demagogueConOrChaBonus = Math.max(Integer.parseInt(attributes.get(2)),Integer.parseInt(attributes.get(5)));
+        }else{
+            throw new IllegalArgumentException("Illegal list length: 0,1,2,6");
+        }
+    }
+    public void setPartisan(List<String> attributes){
+        if(attributes.isEmpty()){
+            partisanStrOrWisBonus = 0;
+        }else if(attributes.size() == 1){
+            partisanStrOrWisBonus = Integer.parseInt(attributes.get(0));
+        }else if(attributes.size() == 2){
+            partisanStrOrWisBonus = Math.max(Integer.parseInt(attributes.get(0)),Integer.parseInt(attributes.get(1)));
+        }else if(attributes.size() == 6){
+            demagogueConOrChaBonus = Math.max(Integer.parseInt(attributes.get(0)),Integer.parseInt(attributes.get(4)));
+        }else{
+            throw new IllegalArgumentException("Illegal list length: 0,1,2,6");
+        }
+    }
+    public void setRecruiter(int level){
+        recruiterLvlBonus = level;
+    }
+    public void setSentinal(List<String> attributes){
+        if(attributes.isEmpty()){
+            sentinelConOrChaBonus = 0;
+            sentinelStrOrWisBonus = 0;
+            sentinelDexOrIntBonus = 0;
+        }else if(attributes.size() == 3){
+            sentinelConOrChaBonus = Integer.parseInt(attributes.get(0));
+            sentinelStrOrWisBonus = Integer.parseInt(attributes.get(1));
+            sentinelDexOrIntBonus = Integer.parseInt(attributes.get(2));
+        }else if(attributes.size() == 6){
+            sentinelConOrChaBonus = Math.max(Integer.parseInt(attributes.get(2)),Integer.parseInt(attributes.get(5)));
+            sentinelStrOrWisBonus = Math.max(Integer.parseInt(attributes.get(0)),Integer.parseInt(attributes.get(4)));
+            sentinelDexOrIntBonus = Math.max(Integer.parseInt(attributes.get(1)),Integer.parseInt(attributes.get(3)));
+        }else{
+            throw new IllegalArgumentException("Illegal list length: 0,3,6");
+        }
+    }
+    public void setSpyMaster(List<String> attributes){
+        if(attributes.isEmpty()){
+            spymasterDexOrIntBonus = 0;
+        }else if(attributes.size() == 1){
+            spymasterDexOrIntBonus = Integer.parseInt(attributes.get(0));
+        }else if(attributes.size() == 2) {
+            spymasterDexOrIntBonus = Math.max(Integer.parseInt(attributes.get(0)),Integer.parseInt(attributes.get(1)));
+        }else if(attributes.size() == 6){
+            spymasterDexOrIntBonus = Math.max(Integer.parseInt(attributes.get(1)),Integer.parseInt(attributes.get(3)));
+        }else{
+            throw new IllegalArgumentException("Illegal list length: 0,1,2,6");
+        }
+    }
+    public void setStrategist(List<String> attributes){
+        if(attributes.isEmpty()){
+            hasStrategist = false;
+        }else{
+            hasStrategist = true;
+        }
+    }
+
+    public Focus getFocus() {
+        return focus;
+    }
+
+    public void setFocus(Focus focus){
+        this.focus = focus;
+    }
+
+    public void setDangerRating(int dangerRating) {
+        this.dangerRating = dangerRating;
+    }
+
+    public void addDangerRating(int dangerRating) {
+        this.dangerRating += dangerRating;
+    }
+
+    public int getDangerRating() {
+        return dangerRating;
+    }
+
+    public int getLoyaltyBonus(){
+        return getCheckBonus(Focus.LOYALTY) + getDemagogueConOrChaBonus() + getSentinelConOrChaBonus() + getLoyaltyOther();
+    }
+
+    public int getSecrecyBonus(){
+        return getCheckBonus(Focus.SECRECY) + getSpymasterDexOrIntBonus() + getSentinelDexOrIntBonus() + getSecrecyOther();
+    }
+
+    public int getSecurityBonus(){
+        return getCheckBonus(Focus.SECURITY) + getPartisanStrOrWisBonus() + getSentinelStrOrWisBonus() + getSecurityOther();
+    }
+
+    private int getCheckBonus(Focus focus) {
+        int checkBonus;
+        if (focus == this.focus) {
+            checkBonus = getFocusCheckBonus();
+        } else {
+            checkBonus = getSecondaryCheckBonus();
+        }
+        return checkBonus;
     }
 
     public int getSecondaryCheckBonus() {
@@ -78,6 +208,10 @@ public class Rebellion {
     @NotNull
     public int getTreasury() {
         return treasury;
+    }
+
+    public void setRebellionName(String rebellionName){
+        this.rebellionName = rebellionName;
     }
 
     @NotNull
@@ -195,5 +329,73 @@ public class Rebellion {
 
     public void setMaxRank(int maxRank) {
         this.rebellionMaxLevel = maxRank;
+    }
+
+    public void addLoyaltyOther(int loyaltyOther) {
+        this.loyaltyOther += loyaltyOther;
+    }
+
+    public void setLoyaltyOther(int loyaltyOther) {
+        this.loyaltyOther = loyaltyOther;
+    }
+
+    public void addSecrecyOther(int secrecyOther) {
+        this.secrecyOther += secrecyOther;
+    }
+
+    public void setSecrecyOther(int secrecyOther) {
+        this.secrecyOther = secrecyOther;
+    }
+
+    public void addSecurityOther(int securityOther) {
+        this.securityOther += securityOther;
+    }
+
+    public void setSecurityOther(int securityOther) {
+        this.securityOther = securityOther;
+    }
+
+    public int getDemagogueConOrChaBonus() {
+        return demagogueConOrChaBonus;
+    }
+
+    public int getPartisanStrOrWisBonus() {
+        return partisanStrOrWisBonus;
+    }
+
+    public int getRecruiterLvlBonus() {
+        return recruiterLvlBonus;
+    }
+
+    public int getSentinelConOrChaBonus() {
+        return sentinelConOrChaBonus;
+    }
+
+    public int getSentinelStrOrWisBonus() {
+        return sentinelStrOrWisBonus;
+    }
+
+    public int getSentinelDexOrIntBonus() {
+        return sentinelDexOrIntBonus;
+    }
+
+    public int getSpymasterDexOrIntBonus() {
+        return spymasterDexOrIntBonus;
+    }
+
+    public boolean isHasStrategist() {
+        return hasStrategist;
+    }
+
+    public int getLoyaltyOther() {
+        return loyaltyOther;
+    }
+
+    public int getSecrecyOther() {
+        return secrecyOther;
+    }
+
+    public int getSecurityOther() {
+        return securityOther;
     }
 }

@@ -58,7 +58,9 @@ public class GroupBehavior implements Behavior {
     public void run(MessageReceivedEvent event, ArrayList<String> message)
     {
         if(message.isEmpty()){
-            defaultBehavior.run(event, message);
+            if(defaultBehavior != null) {
+                defaultBehavior.run(event, message);
+            }
             return;
         }
 
@@ -66,7 +68,9 @@ public class GroupBehavior implements Behavior {
 
         if (token == null)
         {
-            defaultBehavior.run(event, message);
+            if(defaultBehavior != null) {
+                defaultBehavior.run(event, message);
+            }
             return;
         }
 
