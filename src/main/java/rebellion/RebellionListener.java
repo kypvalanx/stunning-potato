@@ -3,16 +3,20 @@ package rebellion;
 import behavior.Behavior;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import rebellion.events.RebellionEvent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 public class RebellionListener extends ListenerAdapter {
+	private Integer checkDC = null;
+	private String failureString = null;
+
 	private final GroupBehavior primaryContext;
 	private final GroupBehavior defaultContext;
 	private Map<String, Rebellion> rebellions;
@@ -31,10 +35,27 @@ public class RebellionListener extends ListenerAdapter {
 
 		Behavior var = getVarBehavior();
 
+		Behavior dc = new GroupBehavior()
+				.setDefault(((event, message) -> {
+					if(checkDC == null){
+						event.getChannel().sendMessage("No current set DC.").queue();
+					}else {
+						event.getChannel().sendMessage("The Next die roll will be checked against DC " + checkDC).queue();
+					}
+				}))
+				.add("set", (event, message) -> {
+					checkDC = Integer.parseInt(message.remove(0));
+					if(!message.isEmpty()) {
+						failureString = String.join(" ", message);
+					}
+					event.getChannel().sendMessage("The Next die roll will be checked against DC " + checkDC).queue();
+				});
+
 		primaryContext = new GroupBehavior()
 				.add(rebellion, "rebellion", "r")
 				.add(roll, "roll")
-				.add(var, "var");
+				.add(var, "var")
+				.add("dc", dc);
 
 		Behavior help = new NachoHelpBehavior(primaryContext);
 		primaryContext.add(help, "help");
@@ -190,6 +211,7 @@ public class RebellionListener extends ListenerAdapter {
 						event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message)+"+"+currentRebellion.getLoyaltyBonus())).queue();
 					}
 					event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
+					attemptCheck(event, dieParser.getRoll());
 				}, "roll loyalty")
 				.add((event, message) -> {
 					final DieParser dieParser = new DieParser(variables);
@@ -199,6 +221,7 @@ public class RebellionListener extends ListenerAdapter {
 						event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message)+"+"+currentRebellion.getSecrecyBonus())).queue();
 					}
 					event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
+					attemptCheck(event, dieParser.getRoll());
 				}, "roll secrecy")
 				.add((event, message) -> {
 					final DieParser dieParser = new DieParser(variables);
@@ -208,6 +231,7 @@ public class RebellionListener extends ListenerAdapter {
 						event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message)+"+"+currentRebellion.getSecurityBonus())).queue();
 					}
 					event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
+					attemptCheck(event, dieParser.getRoll());
 				}, "roll security")
 
 				.add((event, message) -> {
@@ -268,9 +292,23 @@ public class RebellionListener extends ListenerAdapter {
 	private Behavior getRollBehavior() {
 		return (event, message) -> {
 			final DieParser dieParser = new DieParser(variables);
-			event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message))).queue();
+			final int roll = dieParser.parseDieValue(String.join(" ", message));
+			event.getChannel().sendMessage(" " + roll).queue();
 			event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
+			attemptCheck(event, roll);
 		};
+	}
+
+	private void attemptCheck(MessageReceivedEvent event, int roll) {
+		if(checkDC != null){
+			if(roll < checkDC){
+				event.getChannel().sendMessage("Check Failed! " + failureString).queue();
+			}else{
+				event.getChannel().sendMessage("Check Passed!").queue();
+			}
+			checkDC = null;
+			failureString = null;
+		}
 	}
 
 	private Behavior getVarBehavior() {

@@ -8,6 +8,7 @@ import java.util.Random;
 public class DieParser {
     private final Map<String, String> variables;
     private final List<String> steps = new ArrayList<>();
+    private int sum;
 
     public DieParser(Map<String, String> variables) {
         this.variables = variables;
@@ -17,7 +18,7 @@ public class DieParser {
         String digest = payload.replace("-", "+-");
         String[] values = digest.split("\\+");
 
-        int sum = 0;
+         sum = 0;
 
         for (String value : values) {
             int subtract = 1;
@@ -68,5 +69,9 @@ public class DieParser {
     public String getSteps(){
         return "{ "+String.join(" + ", steps).replace(" + -", " - ")+" }";
 
+    }
+
+    public int getRoll(){
+        return sum;
     }
 }

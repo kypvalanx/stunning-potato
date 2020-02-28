@@ -18,6 +18,13 @@ public class GroupBehavior implements Behavior {
         defaultBehavior = behavior;
     }
 
+    public GroupBehavior add(String path, Behavior behavior){
+        return add(behavior, path);
+    }
+    public GroupBehavior add(String[] path, Behavior behavior){
+        return add(behavior, path);
+    }
+
     public GroupBehavior add(Behavior behavior, String... paths)
     {
         for (String path : paths)
@@ -86,8 +93,9 @@ public class GroupBehavior implements Behavior {
         }
     }
 
-    public void setDefault(Behavior behavior) {
+    public GroupBehavior setDefault(Behavior behavior) {
         defaultBehavior = behavior;
+        return this;
     }
 
     public boolean hasDefault() {
