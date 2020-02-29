@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GroupBehavior implements Behavior {
@@ -16,6 +17,14 @@ public class GroupBehavior implements Behavior {
     }
     public GroupBehavior(Behavior behavior){
         defaultBehavior = behavior;
+    }
+
+    public GroupBehavior add(List<KeyedBehavior> keyedBehaviors){
+        for (KeyedBehavior keyedBehavior :
+                keyedBehaviors) {
+            add(keyedBehavior.getKeys(), keyedBehavior.getBehavior());
+        }
+        return this;
     }
 
     public GroupBehavior add(String path, Behavior behavior){
