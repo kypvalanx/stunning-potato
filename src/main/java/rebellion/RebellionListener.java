@@ -2,7 +2,6 @@ package rebellion;
 
 import behavior.Behavior;
 import behavior.GroupBehavior;
-import behavior.KeyedBehavior;
 import behavior.NachoHelpBehavior;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -12,7 +11,6 @@ import rebellion.events.RebellionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RebellionListener extends ListenerAdapter {
@@ -53,13 +51,11 @@ public class RebellionListener extends ListenerAdapter {
                     event.getChannel().sendMessage("The Next die roll will be checked against DC " + checkDC).queue();
                 });
 
-        Behavior rules = getRulesBehavior();
         primaryContext = new GroupBehavior()
                 .add(new String[]{"rebellion", "r"}, rebellion)
                 .add(roll, "roll")
                 .add(var, "var")
-                .add("dc", dc)
-                .add(new String[]{"how", "how do i", "how does", "how do", "what is", "what"}, rules);
+                .add("dc", dc);
 
         Behavior help = new NachoHelpBehavior(primaryContext);
         primaryContext.add(help, "help");
@@ -69,228 +65,7 @@ public class RebellionListener extends ListenerAdapter {
 
     }
 
-    private Behavior getRulesBehavior() {
-//
-        List<KeyedBehavior> behaviors = List.of(
-                new KeyedBehavior() {
-                    @Override
-                    public String[] getKeys() {
-                        return new String[]{"grapple"};
-                    }
-
-                    @Override
-                    public Behavior getBehavior() {
-                        return (event, message) -> {
-                            event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Grapple").queue();
-                        };
-                    }
-                },
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"concentration", "cast defensively"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Concentration").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"aid another"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Aid_Another").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"charge"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Charge").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"bull rush"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Bull_Rush").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"dirty trick"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Dirty_Trick").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"disarm"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Disarm").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"drag"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Drag").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"overrun"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Overrun-2").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"reposition"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Reposition").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"steal"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Steal").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"sunder"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Sunder").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"trip"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Trip").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"delay", "delay action", "delay turn"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Delay").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"ready", "ready action", "ready attack"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Ready").queue();
-						};
-					}
-				},
-				new KeyedBehavior() {
-					@Override
-					public String[] getKeys() {
-						return new String[]{"feint"};
-					}
-
-					@Override
-					public Behavior getBehavior() {
-						return (event, message) -> {
-							event.getChannel().sendMessage("https://www.d20pfsrd.com/gamemastering/Combat/#Feint").queue();
-						};
-					}
-				});
-
-        return new GroupBehavior().add(behaviors).setDefault((event, message) -> {
-        	String rules= "";
-        	for(KeyedBehavior keyedBehavior: behaviors){
-        		rules = rules.concat(Arrays.toString(keyedBehavior.getKeys()) + "\n");
-			}
-        	event.getChannel().sendMessage("Available Rules:\n" + rules).queue();
-		});
-    }
-
-    private GroupBehavior getRebellionBehavior() {
+	private GroupBehavior getRebellionBehavior() {
         return new GroupBehavior()
                 .add(this::handleRebellionSheet, "sheet")
 
