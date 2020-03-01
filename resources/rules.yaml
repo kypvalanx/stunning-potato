@@ -1,0 +1,53 @@
+- keys:
+  - "grapple"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Grapple"
+- keys:
+  - "concentration"
+  - "cast defensively"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Concentration"
+- keys:
+  - "aid another"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Aid_Another"
+- keys:
+  - "charge"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Charge"
+- keys:
+  - "bull rush"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Bull_Rush"
+- keys:
+  - "dirty trick"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Dirty_Trick"
+- keys:
+  - "disarm"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Disarm"
+- keys:
+  - "drag"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Drag"
+- keys:
+  - "overrun"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Overrun-2"
+- keys:
+  - "reposition"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Reposition"
+- keys:
+  - "steal"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Steal"
+- keys:
+  - "sunder"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Sunder"
+- keys:
+  - "trip"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Trip"
+- keys:
+  - "delay"
+  - "delay action"
+  - "delay turn"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Delay"
+- keys:
+  - "ready"
+  - "ready action"
+  - "ready attack"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Ready"
+- keys:
+  - "feint"
+  value: "https://www.d20pfsrd.com/gamemastering/Combat/#Feint"
