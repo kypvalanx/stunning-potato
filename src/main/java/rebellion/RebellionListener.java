@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import rebellion.events.RebellionEvent;
+import behavior.ChannelHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +37,13 @@ public class RebellionListener extends ListenerAdapter {
         Behavior var = getVarBehavior();
 
         Behavior dc = new GroupBehavior()
-                .setDefault(((event, message) -> {
+                .setDefault((event, message) -> {
                     if (checkDC == null) {
                         event.getChannel().sendMessage("No current set DC.").queue();
                     } else {
                         event.getChannel().sendMessage("The Next die roll will be checked against DC " + checkDC).queue();
                     }
-                }))
+                })
                 .add("set", (event, message) -> {
                     checkDC = Integer.parseInt(message.remove(0));
                     if (!message.isEmpty()) {
@@ -294,7 +295,7 @@ public class RebellionListener extends ListenerAdapter {
             final DieParser dieParser = new DieParser(variables);
             final int roll = dieParser.parseDieValue(String.join(" ", message));
             event.getChannel().sendMessage(" " + roll).queue();
-            event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
+            ChannelHelper.sendLongMessage(event, " ", dieParser.getSteps());
             attemptCheck(event, roll);
         };
     }

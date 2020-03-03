@@ -8,13 +8,13 @@ public interface Behavior {
 
     void run(MessageReceivedEvent event, ArrayList<String> message);
 
-    default String getHelp(MessageReceivedEvent event, String s)
+    default void getHelp(MessageReceivedEvent event, ArrayList<String> message)
     {
-        return "No help available for ".concat(s).concat(".");
+        event.getChannel().sendMessage("No help available for ".concat(String.join(" ", message)).concat(".")).queue();
     }
 
-    default String getDetailedHelp(MessageReceivedEvent event, ArrayList<String> s)
+    default void getDetailedHelp(MessageReceivedEvent event, ArrayList<String> s)
     {
-        return "No detailed help available for ".concat(String.join(" ", s)).concat(".");
+        event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s)).concat(".")).queue();
     }
 }

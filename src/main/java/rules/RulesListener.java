@@ -7,7 +7,6 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import rebellion.RulesLookupBehavior;
 
 public class RulesListener extends ListenerAdapter {
 	private final Behavior core;
@@ -15,7 +14,7 @@ public class RulesListener extends ListenerAdapter {
 	public RulesListener(){
 
 		Behavior rules = new RulesLookupBehavior().getRulesBehavior();
-		core =  new GroupBehavior().add(new String[]{"how", "how do i", "how does", "how do", "what is", "what"}, rules);
+		core =  new GroupBehavior().add(new String[]{"how", "how to", "how do i", "how does", "how do", "rule", "rules"}, rules);
 	}
 
 	@Override

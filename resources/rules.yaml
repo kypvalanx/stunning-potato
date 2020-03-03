@@ -51,3 +51,26 @@
 - keys:
   - "feint"
   value: "https://www.d20pfsrd.com/gamemastering/Combat/#Feint"
+- keys:
+  - "two weapon"
+  - "two weapon fighting"
+  - "dual wielding"
+  value: "https://www.d20pfsrd.com/gamemastering/combat/#Two-Weapon_Fighting"
+- keys:
+  - "full round action"
+  - "full round attack"
+  - "full round"
+  value: "https://www.d20pfsrd.com/Gamemastering/combat/#Full-Round_Actions"
+- keys:
+  - "standard action"
+  - "standard attack"
+  - "standard"
+  value: "https://www.d20pfsrd.com/Gamemastering/combat/#Standard_Actions"
+- keys:
+  - "move action"
+  - "move"
+  value: "https://www.d20pfsrd.com/Gamemastering/combat/#Move_Actions"
+- keys:
+  - "combat maneuver"
+  - "combat maneuvers"
+  value: "bull rush, disarm, grapple, overrun, sunder, dirty trick, drag, reposition and trip"

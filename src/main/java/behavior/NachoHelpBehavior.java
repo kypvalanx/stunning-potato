@@ -21,17 +21,17 @@ public class NachoHelpBehavior implements Behavior
 
     @Override
     public void run(MessageReceivedEvent event, ArrayList<String> message) {
-
-        if(message.isEmpty()){
-            event.getChannel().sendMessage(groupBehavior.getHelp(event,  message.get(0))).queue();
-        }
-
         if(message.size()>1){
-            event.getChannel().sendMessage(groupBehavior.getDetailedHelp(event, message)).queue();
+            groupBehavior.getDetailedHelp(event, message);
         }else
         {
-            event.getChannel().sendMessage(groupBehavior.getHelp(event,  message.get(0))).queue();
+            groupBehavior.getHelp(event,  message);
         }
+    }
+
+    @Override
+    public void getHelp(MessageReceivedEvent event, ArrayList<String> message) {
+        //NOOP
     }
 
 

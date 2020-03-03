@@ -13,7 +13,8 @@ repositories {
 }
 
 dependencies {
-    //implementation group: 'org.yaml', name: 'snakeyaml', version: '1.8'
+    compile 'org.jsoup:jsoup:1.13.1'
+    compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.2'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.2'
     compile group: 'org.mockito', name: 'mockito-core', version: '3.3.0'

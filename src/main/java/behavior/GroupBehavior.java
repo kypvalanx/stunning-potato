@@ -1,5 +1,6 @@
 package behavior;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -8,6 +9,19 @@ import java.util.List;
 import java.util.Map;
 
 public class GroupBehavior implements Behavior {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupBehavior that = (GroupBehavior) o;
+        return Objects.equals(behaviors, that.behaviors) &&
+                Objects.equals(defaultBehavior, that.defaultBehavior);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(behaviors, defaultBehavior);
+    }
 
     private Map<String, Behavior> behaviors = new HashMap<>();
     private Behavior defaultBehavior;
@@ -22,7 +36,7 @@ public class GroupBehavior implements Behavior {
     public GroupBehavior add(List<KeyedBehavior> keyedBehaviors){
         for (KeyedBehavior keyedBehavior :
                 keyedBehaviors) {
-            add(keyedBehavior.getKeys(), keyedBehavior.getBehavior());
+            add(keyedBehavior.getKeys(), keyedBehavior);
         }
         return this;
     }
@@ -53,7 +67,11 @@ public class GroupBehavior implements Behavior {
                         existingGroupBehavior.setDefault(behavior);
                         continue;
                     }
-                    throw new IllegalStateException("default behavior already exists");
+                    Behavior existingDefault = existingGroupBehavior.getDefault();
+                    if(!existingDefault.equals(behavior)) {
+System.out.println("default behavior already exists: "+ path);
+//                            throw new IllegalStateException("default behavior already exists: "+ path);
+                        }
                 }
                 behaviors.put(path.toLowerCase(), new GroupBehavior(behavior));
             } else {
@@ -68,6 +86,10 @@ public class GroupBehavior implements Behavior {
             }
         }
         return this;
+    }
+
+    private Behavior getDefault() {
+        return defaultBehavior;
     }
 
     @Override
@@ -112,11 +134,13 @@ public class GroupBehavior implements Behavior {
     }
 
     @Override
-    public String getHelp(MessageReceivedEvent event, String s) {
-        String help = defaultBehavior.getHelp(event, s);
-        for(Behavior behavior : behaviors.values()){
-            help = help.concat(behavior.getHelp(event, s));
+    public void getHelp(MessageReceivedEvent event, ArrayList<String> s) {
+
+        if(defaultBehavior != null) {
+            defaultBehavior.getHelp(event, s);
         }
-        return help;
+        for(Behavior behavior : behaviors.values()){
+            behavior.getHelp(event, s);
+        }
     }
 }

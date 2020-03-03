@@ -57,6 +57,10 @@ public class DieParser {
         int size = Integer.parseInt(tokens[1]);
         Random rand = new Random();
         int sum = 0;
+//        return IntStream.range(0,times).parallel().map(i -> {int roll = rand.nextInt(size) + 1;
+//        steps.add(""+roll);
+//        return roll;}
+//        ).reduce(0, (left, right) -> left+right);
         for (int i = 0; i < times; i++) {
             final int roll = rand.nextInt(size) + 1;
             sum += roll;
