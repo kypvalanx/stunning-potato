@@ -17,4 +17,9 @@ public interface Behavior {
     {
         event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s)).concat(".")).queue();
     }
+
+    default Behavior merge(Behavior that){
+        System.err.println("Unsupported Behavior Merge: " + this + "\n                            " + that);
+        return null;
+    }
 }

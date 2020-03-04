@@ -1,11 +1,15 @@
-package rebellion;
+package core;
 
 import behavior.Behavior;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
+import items.ItemListener;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import rebellion.DieParser;
+import rebellion.Focus;
+import rebellion.Rebellion;
 import rebellion.events.RebellionEvent;
 import behavior.ChannelHelper;
 
@@ -13,8 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import rules.RulesLookupBehavior;
 
-public class RebellionListener extends ListenerAdapter {
+public class CoreListener extends ListenerAdapter {
     private Integer checkDC = null;
     private String failureString = null;
 
@@ -25,16 +30,10 @@ public class RebellionListener extends ListenerAdapter {
     private Map<String, String> variables;
     private Context currentContext = Context.DEFAULT;
 
-    public RebellionListener() {
+    public CoreListener() {
         rebellions = new HashMap<>();
         currentRebellion = new Rebellion();
         variables = new HashMap<>();
-
-        final GroupBehavior rebellion = getRebellionBehavior();
-
-        Behavior roll = getRollBehavior();
-
-        Behavior var = getVarBehavior();
 
         Behavior dc = new GroupBehavior()
                 .setDefault((event, message) -> {
@@ -53,10 +52,12 @@ public class RebellionListener extends ListenerAdapter {
                 });
 
         primaryContext = new GroupBehavior()
-                .add(new String[]{"rebellion", "r"}, rebellion)
-                .add(roll, "roll")
-                .add(var, "var")
-                .add("dc", dc);
+                .add(new String[]{"rebellion", "r"}, getRebellionBehavior())
+                .add(getRollBehavior(), "roll")
+                .add(getVarBehavior(), "var")
+                .add("dc", dc)
+                .add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
+                .add(new String[]{"item","!i"}, new ItemListener());
 
         Behavior help = new NachoHelpBehavior(primaryContext);
         primaryContext.add(help, "help");

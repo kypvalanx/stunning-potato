@@ -1,14 +1,26 @@
 package behavior;
 
+import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class KeyedBehavior implements Behavior {
-    private List<String> keys;
+    private Set<String> keys;
     private String value;
-	private List<String> categories;
+	private Set<String> categories;
+
+	public KeyedBehavior(){
+
+	}
+
+	public KeyedBehavior(Set<String> keys, String value, Set<String> categories) {
+		this.keys = keys;
+		this.value = value;
+		this.categories = categories;
+	}
 
 	public String[] getKeys(){
         return keys.toArray(new String[0]);
@@ -28,7 +40,7 @@ public class KeyedBehavior implements Behavior {
 		//event.getChannel().sendMessage(String.join(", ", keys) + "=>" + value).queue();
 	}
 
-    public void setKeys(List<String> keys) {
+    public void setKeys(Set<String> keys) {
         this.keys = keys;
     }
 
@@ -51,11 +63,37 @@ public class KeyedBehavior implements Behavior {
 		return Objects.hash(keys, value, categories);
 	}
 
-	public void addCategories(List<String> categories) {
+	public void addCategories(Set<String> categories) {
 		this.categories = categories;
 	}
 
-	public List<String> getCategories() {
+	public Set<String> getCategories() {
 		return categories;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("keys", keys)
+				.add("value", value)
+				.add("categories", categories)
+				.toString();
+	}
+
+	@Override
+	public Behavior merge(Behavior that) {
+		if(that == null){
+			return this;
+		}else if(that instanceof KeyedBehavior) {
+			this.keys = new HashSet<>(this.keys);
+			keys.addAll(((KeyedBehavior) that).keys);
+			this.categories = new HashSet<>(this.categories);
+			categories.addAll(((KeyedBehavior) that).categories);
+
+			this.value += "\nor " + ((KeyedBehavior) that).value;
+		} else if(that instanceof GroupBehavior){
+			return that.merge(this);
+		}
+		return this;
 	}
 }
