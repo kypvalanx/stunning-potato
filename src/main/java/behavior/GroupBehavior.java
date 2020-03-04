@@ -1,15 +1,17 @@
 package behavior;
 
 import com.google.common.base.MoreObjects;
+import core.DeckList;
 import java.util.Objects;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GroupBehavior implements Behavior {
+public class GroupBehavior extends Behavior {
+    private String helpString;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,16 +123,16 @@ public class GroupBehavior implements Behavior {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, ArrayList<String> message)
+    public void run(MessageReceivedEvent event, DeckList<String> message)
     {
-        if(message.isEmpty()){
+        if(!message.canDraw()){
             if(defaultBehavior != null) {
                 defaultBehavior.run(event, message);
             }
             return;
         }
 
-        String token = message.get(0);
+        String token = message.peek();
 
         if (token == null)
         {
@@ -144,7 +146,7 @@ public class GroupBehavior implements Behavior {
 
         if (behavior != null)
         {
-            message.remove(0);
+            message.draw();
             behavior.run(event, message);
         } else if (defaultBehavior != null)
         {
@@ -162,13 +164,17 @@ public class GroupBehavior implements Behavior {
     }
 
     @Override
-    public void getHelp(MessageReceivedEvent event, ArrayList<String> s) {
+    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
+        if(helpString != null){
+            event.getChannel().sendMessage(context + " " + helpString).queue();
+            return;
+        }
 
         if(defaultBehavior != null) {
-            defaultBehavior.getHelp(event, s);
+            defaultBehavior.getHelp(event, message, context);
         }
-        for(Behavior behavior : behaviors.values()){
-            behavior.getHelp(event, s);
+        for(Map.Entry<String,Behavior> behaviorEntry : behaviors.entrySet()){
+            behaviorEntry.getValue().getHelp(event, message, context.concat(" ").concat(behaviorEntry.getKey()));
         }
     }
 
@@ -204,5 +210,9 @@ public class GroupBehavior implements Behavior {
             defaultBehavior = that.merge(defaultBehavior);
         }
         return this;
+    }
+
+    public void setHelpString(String helpString) {
+        this.helpString = helpString;
     }
 }

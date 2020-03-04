@@ -1,25 +1,35 @@
 package behavior;
 
+import core.DeckList;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
+public abstract class Behavior {
 
-public interface Behavior {
+    private GroupBehavior parent;
 
-    void run(MessageReceivedEvent event, ArrayList<String> message);
+    public abstract void run(MessageReceivedEvent event, DeckList<String> message);
 
-    default void getHelp(MessageReceivedEvent event, ArrayList<String> message)
+    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context)
     {
-        event.getChannel().sendMessage("No help available for ".concat(String.join(" ", message)).concat(".")).queue();
+        event.getChannel().sendMessage("No help available for ".concat(context).concat(".")).queue();
     }
 
-    default void getDetailedHelp(MessageReceivedEvent event, ArrayList<String> s)
+    public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s)
     {
         event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s)).concat(".")).queue();
     }
 
-    default Behavior merge(Behavior that){
+    public Behavior merge(Behavior that){
         System.err.println("Unsupported Behavior Merge: " + this + "\n                            " + that);
         return null;
+    }
+
+
+    public GroupBehavior getParent() {
+        return parent;
+    }
+
+    public void setParent(GroupBehavior parent) {
+        this.parent = parent;
     }
 }

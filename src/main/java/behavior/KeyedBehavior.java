@@ -1,13 +1,13 @@
 package behavior;
 
 import com.google.common.base.MoreObjects;
-import java.util.ArrayList;
+import core.DeckList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class KeyedBehavior implements Behavior {
+public class KeyedBehavior extends Behavior {
     private Set<String> keys;
     private String value;
 	private Set<String> categories;
@@ -28,13 +28,13 @@ public class KeyedBehavior implements Behavior {
 
 
 	@Override
-	public void run(MessageReceivedEvent event, ArrayList<String> message) {
+	public void run(MessageReceivedEvent event, DeckList<String> message) {
 
 		event.getChannel().sendMessage(value).queue();
 	}
 
 	@Override
-	public void getHelp(MessageReceivedEvent event, ArrayList<String> message){
+	public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context){
 
 		//NOOP
 		//event.getChannel().sendMessage(String.join(", ", keys) + "=>" + value).queue();

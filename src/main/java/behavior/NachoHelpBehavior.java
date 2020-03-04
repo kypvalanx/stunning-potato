@@ -1,14 +1,13 @@
 package behavior;
 
 
+import core.DeckList;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
 
 /**
  * Created by al029298 on 2/10/17.
  */
-public class NachoHelpBehavior implements Behavior
+public class NachoHelpBehavior extends Behavior
 {
 
     private final GroupBehavior groupBehavior;
@@ -20,17 +19,17 @@ public class NachoHelpBehavior implements Behavior
 
 
     @Override
-    public void run(MessageReceivedEvent event, ArrayList<String> message) {
-        if(message.size()>1){
+    public void run(MessageReceivedEvent event, DeckList<String> message) {
+        if(message.canDraw()){
             groupBehavior.getDetailedHelp(event, message);
         }else
         {
-            groupBehavior.getHelp(event,  message);
+            groupBehavior.getHelp(event,  message, "");
         }
     }
 
     @Override
-    public void getHelp(MessageReceivedEvent event, ArrayList<String> message) {
+    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
         //NOOP
     }
 
