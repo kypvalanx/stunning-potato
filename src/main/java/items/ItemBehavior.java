@@ -52,14 +52,14 @@ public class ItemBehavior extends Behavior{
 		Behavior categoryBehavior = new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				if (message.isEmpty()) {
+				if (!message.canDraw()) {
 					List<String> categoryTitles = Lists.newArrayList(categoryMap.keys().elementSet());
 					event.getChannel().sendMessage("Categories:").queue();
 					for (int i = 0; i < categoryTitles.size(); i += 100) {
 						event.getChannel().sendMessage(String.join("\n", categoryTitles.subList(i, Math.min(i + 100, categoryTitles.size())))).queue();
 					}
 				} else {
-					String key = String.join(" ", message);
+					String key = String.join(" ", message.getDeck());
 					List<KeyedBehavior> items2 = categoryMap.get(key);
 					BehaviorHelper.getAlphabetizedList(items2, key).run(event, message);
 				}

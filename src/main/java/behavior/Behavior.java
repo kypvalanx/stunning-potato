@@ -16,7 +16,7 @@ public abstract class Behavior {
 
     public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s)
     {
-        event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s)).concat(".")).queue();
+        event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s.getAll())).concat(".")).queue();
     }
 
     public Behavior merge(Behavior that){
