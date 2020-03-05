@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import rebellion.Focus;
 import rebellion.Rebellion;
+import rebellion.RebellionBehaviors;
 import rebellion.events.RebellionEvent;
 import rules.RulesLookupBehavior;
 
@@ -104,30 +105,9 @@ public class CoreListener extends ListenerAdapter {
                     }
                 })
 
-                .add(new Behavior() {
-                    @Override
-                    public void run(MessageReceivedEvent event, DeckList<String> message) {
-                        currentRebellion.setSupporters(new DieParser().parseDieValue(message));
-
-                        event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
-                    }
-                }, "set supporters")
-                .add(new Behavior() {
-                    @Override
-                    public void run(MessageReceivedEvent event, DeckList<String> message) {
-                        currentRebellion.addSupporters(new DieParser().parseDieValue(message));
-
-                        event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
-                    }
-                }, "add supporters")
-                .add(new Behavior() {
-                    @Override
-                    public void run(MessageReceivedEvent event, DeckList<String> message) {
-                        currentRebellion.addSupporters(-new DieParser().parseDieValue(message));
-
-                        event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
-                    }
-                }, "subtract supporters")
+                .add(RebellionBehaviors.getSetSupportersBehavior(currentRebellion), "set supporters")
+                .add(RebellionBehaviors.getAddSupportersBehavior(currentRebellion), "add supporters")
+                .add(RebellionBehaviors.getSubSupportersBehavior(currentRebellion), "subtract supporters")
 
 
                 .add(new Behavior() {
