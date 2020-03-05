@@ -1,9 +1,13 @@
 package behavior;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import core.DeckList;
 import java.util.Objects;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.checkerframework.checker.units.qual.K;
 
 import java.util.HashMap;
 import java.util.List;
@@ -173,8 +177,12 @@ public class GroupBehavior extends Behavior {
         if(defaultBehavior != null) {
             defaultBehavior.getHelp(event, message, context);
         }
-        for(Map.Entry<String,Behavior> behaviorEntry : behaviors.entrySet()){
-            behaviorEntry.getValue().getHelp(event, message, context.concat(" ").concat(behaviorEntry.getKey()));
+
+        ArrayListMultimap<Behavior, String> keysByBehavior = Multimaps.invertFrom(Multimaps.forMap(behaviors), ArrayListMultimap.create());
+
+        for(Behavior behavior : keysByBehavior.keySet()){
+            List<String> keys = keysByBehavior.get(behavior);
+            behavior.getHelp(event, message, context.concat(" ").concat(String.join("/", keys)));
         }
     }
 
