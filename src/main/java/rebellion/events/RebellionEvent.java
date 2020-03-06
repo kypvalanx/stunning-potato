@@ -1,5 +1,12 @@
 package rebellion.events;
 
+import behavior.Behavior;
+import core.DeckList;
+import core.DieParser;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
+import rebellion.Rebellion;
+
 public interface RebellionEvent {
 	RebellionEvent WEEK_OF_SECRECY = new RebellionEvent() {
 		@Override
@@ -537,4 +544,46 @@ public interface RebellionEvent {
 	String doEvent();
 
 	String getDescription();
+
+	@NotNull
+	public static Behavior getEventDoBehavior(Rebellion rebellion) {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				int eventNumber;
+				if (!message.canDraw()) {
+					final DieParser dieParser = new DieParser();
+					eventNumber = dieParser.parseDieValue("1d100" + "+" + rebellion.getDangerRating());
+				} else {
+					eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
+				}
+				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
+				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
+				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
+				String text = rebellionEvent.doEvent();
+				if (!text.isBlank()) {
+					event.getChannel().sendMessage(text).queue();
+				}
+			}
+		};
+	}
+
+	@NotNull
+	static Behavior getEventBehavior(Rebellion rebellion) {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				int eventNumber;
+				if (!message.canDraw()) {
+					final DieParser dieParser = new DieParser();
+					eventNumber = dieParser.parseDieValue("1d100" + "+" + rebellion.getDangerRating());
+				} else {
+					eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
+				}
+				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
+				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
+				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
+			}
+		};
+	}
 }

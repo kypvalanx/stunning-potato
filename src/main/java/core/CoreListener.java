@@ -132,73 +132,43 @@ public class CoreListener extends ListenerAdapter {
                 .add(rebellionBehaviors.getSubMembersBehavior(), "subtract members")
 
 
-                .add(getSetMaxRankBehavior(), "set max rank", "set max level")
+                .add(rebellionBehaviors.getSetMaxRankBehavior(), "set max rank", "set max level")
 
 
-                .add(getSetSkillFocusBehavior(), "set focus")
+                .add(rebellionBehaviors.getSetSkillFocusBehavior(), "set focus")
 
 
-                .add(getSetDemagogueBehavior(), "set demagogue")
+                .add(rebellionBehaviors.getSetDemagogueBehavior(), "set demagogue")
 
 
-                .add(getSetPartisanBehavior(), "set partisan")
+                .add(rebellionBehaviors.getSetPartisanBehavior(), "set partisan")
 
 
-                .add(getSetRecruiterBehavior(), "set recruiter")
+                .add(rebellionBehaviors.getSetRecruiterBehavior(), "set recruiter")
 
 
-                .add(getSetSentinelBehavior(), "set sentinel")
+                .add(rebellionBehaviors.getSetSentinelBehavior(), "set sentinel")
 
 
-                .add(getSetSpymasterBehavior(), "set spymaster")
+                .add(rebellionBehaviors.getSetSpymasterBehavior(), "set spymaster")
 
 
-                .add(getSetStrategistBahavior(), "set strategist")
+                .add(rebellionBehaviors.getSetStrategistBahavior(), "set strategist")
 
 
-                .add(getRollLoyaltyCheckBehavior(currentRebellion.getLoyaltyBonus()), "roll loyalty")
-                .add(getRollLoyaltyCheckBehavior(currentRebellion.getSecrecyBonus()), "roll secrecy")
-                .add(getRollLoyaltyCheckBehavior(currentRebellion.getSecurityBonus()), "roll security")
+                .add(getRollCheckBehavior(currentRebellion.getLoyaltyBonus()), "roll loyalty")
+                .add(getRollCheckBehavior(currentRebellion.getSecrecyBonus()), "roll secrecy")
+                .add(getRollCheckBehavior(currentRebellion.getSecurityBonus()), "roll security")
 
-                .add(new Behavior() {
-                    @Override
-                    public void run(MessageReceivedEvent event, DeckList<String> message) {
-                        int eventNumber;
-                        if (!message.canDraw()) {
-                            final DieParser dieParser = new DieParser();
-                            eventNumber = dieParser.parseDieValue("1d100" + "+" + currentRebellion.getDangerRating());
-                        } else {
-                            eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
-                        }
-                        RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
-                        event.getChannel().sendMessage("{" + eventNumber + "}").queue();
-                        event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
-                    }
-                }, "event")
+                .add(RebellionEvent.getEventBehavior(currentRebellion), "event")
 
-                .add(new Behavior() {
-                    @Override
-                    public void run(MessageReceivedEvent event, DeckList<String> message) {
-                        int eventNumber;
-                        if (!message.canDraw()) {
-                            final DieParser dieParser = new DieParser();
-                            eventNumber = dieParser.parseDieValue("1d100" + "+" + currentRebellion.getDangerRating());
-                        } else {
-                            eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
-                        }
-                        RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
-                        event.getChannel().sendMessage("{" + eventNumber + "}").queue();
-                        event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
-                        String text = rebellionEvent.doEvent();
-                        if (!text.isBlank()) {
-                            event.getChannel().sendMessage(text).queue();
-                        }
-                    }
-                }, "event do", "do event");
+                .add(RebellionEvent.getEventDoBehavior(currentRebellion), "event do", "do event");
     }
 
+
+
     @NotNull
-    private Behavior getRollLoyaltyCheckBehavior(int loyaltyBonus) {
+    public Behavior getRollCheckBehavior(int loyaltyBonus) {
         return new Behavior() {
             @Override
             public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -214,94 +184,6 @@ public class CoreListener extends ListenerAdapter {
         };
     }
 
-    @NotNull
-    private Behavior getSetStrategistBahavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setStrategist(message.getDeck());
-                event.getChannel().sendMessage("Strategist Available: " + currentRebellion.isHasStrategist()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetSpymasterBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setSpyMaster(message.getDeck());
-                event.getChannel().sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterDexOrIntBonus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetSentinelBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setSentinal(message.getDeck());
-                event.getChannel().sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelConOrChaBonus() + ", " + currentRebellion.getSentinelStrOrWisBonus() + ", " + currentRebellion.getSentinelDexOrIntBonus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetRecruiterBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setRecruiter(Integer.parseInt(message.getDeck().get(0)));
-                event.getChannel().sendMessage("Recruiter Level Set: " + currentRebellion.getRecruiterLvlBonus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetPartisanBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setPartisan(message.getDeck());
-                event.getChannel().sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanStrOrWisBonus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetDemagogueBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setDemagogue(message.getDeck());
-                event.getChannel().sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueConOrChaBonus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetSkillFocusBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                Focus focus = Focus.valueOf(String.join(" ", message.getDeck()).toUpperCase());
-                currentRebellion.setFocus(focus);
-                event.getChannel().sendMessage("Focus Set: " + currentRebellion.getFocus()).queue();
-            }
-        };
-    }
-
-    @NotNull
-    private Behavior getSetMaxRankBehavior() {
-        return new Behavior() {
-            @Override
-            public void run(MessageReceivedEvent event, DeckList<String> message) {
-                currentRebellion.setMaxRank(new DieParser().parseDieValue(message));
-                event.getChannel().sendMessage("Max Level Set: " + currentRebellion.getRebellionMaxLevel()).queue();
-            }
-        };
-    }
 
 
     @NotNull
