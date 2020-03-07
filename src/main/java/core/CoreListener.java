@@ -6,12 +6,10 @@ import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
 import items.ItemBehavior;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import rebellion.Focus;
 import rebellion.Rebellion;
 import rebellion.RebellionBehaviors;
 import rebellion.events.RebellionEvent;
@@ -20,12 +18,12 @@ import rules.RulesLookupBehavior;
 public class CoreListener extends ListenerAdapter {
     private final GroupBehavior primaryContext;
     private final GroupBehavior defaultContext;
-    private Map<String, Rebellion> rebellions;
+    //private Map<String, Rebellion> rebellions;
     private Rebellion currentRebellion;
     private Context currentContext = Context.DEFAULT;
 
     public CoreListener() {
-        rebellions = new HashMap<>();
+        //rebellions = new HashMap<>();
         currentRebellion = new Rebellion();
 
         Behavior dc = new GroupBehavior()
@@ -105,63 +103,33 @@ public class CoreListener extends ListenerAdapter {
                         handleRebellionSheet(event, message);
                     }
                 })
-
-
                 .add(rebellionBehaviors.getSetSupportersBehavior(), "set supporters")
                 .add(rebellionBehaviors.getAddSupportersBehavior(), "add supporters")
                 .add(rebellionBehaviors.getSubSupportersBehavior(), "subtract supporters")
-
-
                 .add(rebellionBehaviors.getSetTreasureyBehavior(), "set treasury")
                 .add(rebellionBehaviors.getAddTreasureyBehavior(), "add treasury")
                 .add(rebellionBehaviors.getSubTreasureyBehavior(), "subtract treasury")
-
-
                 .add(rebellionBehaviors.getSetPopulationBehavior(), "set population")
                 .add(rebellionBehaviors.getAddPopulationBehavior(), "add population")
                 .add(rebellionBehaviors.getSubPopulationBahavior(), "subtract population")
-
-
                 .add(rebellionBehaviors.getSetNotorietyBehavior(), "set notoriety")
                 .add(rebellionBehaviors.getAddNotorietyBehavior(), "add notoriety")
                 .add(rebellionBehaviors.getSubNotorietyBehavior(), "subtract notoriety")
-
-
                 .add(rebellionBehaviors.getSetMembersBehavior(), "set members")
                 .add(rebellionBehaviors.getAddMembersBehavior(), "add members")
                 .add(rebellionBehaviors.getSubMembersBehavior(), "subtract members")
-
-
                 .add(rebellionBehaviors.getSetMaxRankBehavior(), "set max rank", "set max level")
-
-
                 .add(rebellionBehaviors.getSetSkillFocusBehavior(), "set focus")
-
-
                 .add(rebellionBehaviors.getSetDemagogueBehavior(), "set demagogue")
-
-
                 .add(rebellionBehaviors.getSetPartisanBehavior(), "set partisan")
-
-
                 .add(rebellionBehaviors.getSetRecruiterBehavior(), "set recruiter")
-
-
                 .add(rebellionBehaviors.getSetSentinelBehavior(), "set sentinel")
-
-
                 .add(rebellionBehaviors.getSetSpymasterBehavior(), "set spymaster")
-
-
                 .add(rebellionBehaviors.getSetStrategistBahavior(), "set strategist")
-
-
                 .add(getRollCheckBehavior(currentRebellion.getLoyaltyBonus()), "roll loyalty")
                 .add(getRollCheckBehavior(currentRebellion.getSecrecyBonus()), "roll secrecy")
                 .add(getRollCheckBehavior(currentRebellion.getSecurityBonus()), "roll security")
-
                 .add(RebellionEvent.getEventBehavior(currentRebellion), "event")
-
                 .add(RebellionEvent.getEventDoBehavior(currentRebellion), "event do", "do event");
     }
 
@@ -252,25 +220,21 @@ public class CoreListener extends ListenerAdapter {
 
     private void handleRebellionSheet(@NotNull MessageReceivedEvent event, DeckList<String> message) {
         if (!message.canDraw()) {
-
-            Rebellion rebellion = getCurrentRebellion();
-            event.getChannel().sendMessage(rebellion.getSheet()).queue();
-        } else if(false){
-            String key = String.join(" ", message.getDeck());
-            Rebellion rebellion = getRebellion(key);
-            if (rebellion == null) {
-                event.getChannel().sendMessage("I can't find the " + key + " rebellion").queue();
-            } else {
-                event.getChannel().sendMessage(rebellion.getSheet()).queue();
-            }
+            event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
         }
+//        else if(false){
+//            String key = String.join(" ", message.getDeck());
+//            Rebellion rebellion = getRebellion(key);
+//            if (rebellion == null) {
+//                event.getChannel().sendMessage("I can't find the " + key + " rebellion").queue();
+//            } else {
+//                event.getChannel().sendMessage(rebellion.getSheet()).queue();
+//            }
+//        }
     }
 
-    private Rebellion getRebellion(String key) {
-        return rebellions.get(key);
-    }
+//    private Rebellion getRebellion(String key) {
+//        return rebellions.get(key);
+//    }
 
-    private Rebellion getCurrentRebellion() {
-        return currentRebellion;
-    }
 }

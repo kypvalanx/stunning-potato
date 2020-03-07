@@ -2,6 +2,7 @@ package items;
 
 import behavior.Behavior;
 import behavior.BehaviorHelper;
+import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.KeyedBehavior;
 import com.google.common.collect.LinkedListMultimap;
@@ -10,12 +11,14 @@ import core.DeckList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.collections4.MultiMapUtils;
+import org.apache.commons.collections4.SetValuedMap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,6 +27,8 @@ import org.jsoup.select.Elements;
 public class ItemBehavior extends Behavior{
 
 	private final GroupBehavior groupBehavior;
+
+	private final SetValuedMap<String, String> searchIndex = MultiMapUtils.newSetValuedHashMap();
 
 	public ItemBehavior(){
 
@@ -40,11 +45,16 @@ public class ItemBehavior extends Behavior{
 
 		LinkedListMultimap<String, KeyedBehavior> categoryMap = LinkedListMultimap.create(behaviors.size());
 
-		behaviors.forEach(new Consumer<KeyedBehavior>() {
-			@Override
-			public void accept(KeyedBehavior keyedBehavior) {
-				for (String key : keyedBehavior.getCategories()) {
-					categoryMap.put(key, keyedBehavior);
+		behaviors.forEach(keyedBehavior -> {
+			for (String key : keyedBehavior.getCategories()) {
+				categoryMap.put(key, keyedBehavior);
+			}
+		});
+
+		behaviors.forEach(keyedBehavior -> {
+			for(String key : keyedBehavior.getKeys()){
+				for(String subKey: key.split(" ")){
+					searchIndex.put(subKey, key);
 				}
 			}
 		});
@@ -68,8 +78,26 @@ public class ItemBehavior extends Behavior{
 
 		this.groupBehavior = new GroupBehavior()
 				.add(behaviors)
-				.add(BehaviorHelper.getAlphabetizedList(behaviors, "Available Items"), "list")
-				.add(new String[]{"categories", "c"}, categoryBehavior);
+				.add("list" , BehaviorHelper.getAlphabetizedList(behaviors, "Available Items"))
+				.add(new String[]{"categories", "c"}, categoryBehavior)
+				.add("search", getSearchBehavior());
+	}
+
+	private Behavior getSearchBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				if(message.canDraw()){
+					String searchTerm = String.join(" ", message.getDeck());
+
+					String results = searchIndex.entries().stream()
+							.filter(entry -> entry.getKey().contains(searchTerm))
+							.map(Map.Entry::getValue).distinct().sorted().collect(Collectors.joining("\n"));
+
+					ChannelHelper.sendLongMessage(event,"\n",results);
+				}
+			}
+		};
 	}
 
 	private static List<KeyedBehavior> getKeyedBehaviors(String root) {
