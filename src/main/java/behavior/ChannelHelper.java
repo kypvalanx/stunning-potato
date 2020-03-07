@@ -4,6 +4,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ChannelHelper {
 	public static void sendLongMessage(MessageReceivedEvent event, String delimiter, String steps) {
+		if(steps == null || steps.isEmpty()){
+			return;
+		}
 		String[] tokens = steps.split(delimiter);
 
 		String message = "";

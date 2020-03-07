@@ -71,14 +71,14 @@ public class ItemBehavior extends Behavior{
 				} else {
 					String key = String.join(" ", message.getDeck());
 					List<KeyedBehavior> items2 = categoryMap.get(key);
-					BehaviorHelper.getAlphabetizedList(items2, key).run(event, message);
+					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key).run(event, message);
 				}
 			}
 		};
 
 		this.groupBehavior = new GroupBehavior()
 				.add(behaviors)
-				.add("list" , BehaviorHelper.getAlphabetizedList(behaviors, "Available Items"))
+				.add("list" , BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Items"))
 				.add(new String[]{"categories", "c"}, categoryBehavior)
 				.add("search", getSearchBehavior());
 	}

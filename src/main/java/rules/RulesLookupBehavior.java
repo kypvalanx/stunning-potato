@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RulesLookupBehavior extends Behavior{
@@ -32,7 +33,7 @@ public class RulesLookupBehavior extends Behavior{
 
 				List<KeyedBehavior> behaviors = mapper.readValue(file, mapType);
 
-				behavior.add(behaviors).setDefault(BehaviorHelper.getAlphabetizedList(behaviors, "Available Rules:"));
+				behavior.add(behaviors).setDefault(BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Rules:"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

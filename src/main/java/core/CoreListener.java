@@ -14,6 +14,7 @@ import rebellion.Rebellion;
 import rebellion.RebellionBehaviors;
 import rebellion.events.RebellionEvent;
 import rules.RulesLookupBehavior;
+import weapons.WeaponsBehavior;
 
 public class CoreListener extends ListenerAdapter {
     private final GroupBehavior primaryContext;
@@ -54,7 +55,8 @@ public class CoreListener extends ListenerAdapter {
                 .add(getVarBehavior(), "var")
                 .add("dc", dc)
                 .add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
-                .add(new String[]{"item","!i"}, new ItemBehavior());
+                .add(new String[]{"item","!i"}, new ItemBehavior())
+                .add(new String[]{"weapon", "!w"}, new WeaponsBehavior());
 
         Behavior help = new NachoHelpBehavior(primaryContext);
         primaryContext.add(help, "help");

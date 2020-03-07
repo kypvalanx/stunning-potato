@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BehaviorHelper {
 	@NotNull
-	public static Behavior getAlphabetizedList(@NotNull final List<KeyedBehavior> behaviors, @NotNull final String listTitle) {
+	public static Behavior getAlphabetizedListOLD(@NotNull final List<KeyedBehavior> behaviors, @NotNull final String listTitle) {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -21,6 +21,22 @@ public class BehaviorHelper {
 					event.getChannel().sendMessage(listTitle).queue();
 
 					ChannelHelper.sendLongMessage(event, "\n", rulesList);
+				}
+			}
+		};
+	}
+	@NotNull
+	public static Behavior getAlphabetizedList(@NotNull final List<String> behaviorKeys, @NotNull final String listTitle) {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				if (!behaviorKeys.isEmpty()) {
+					String keyList = behaviorKeys.stream().sorted()
+							.map(key -> String.join(", ", key)).collect(Collectors.joining("\n"));
+
+					event.getChannel().sendMessage(listTitle).queue();
+
+					ChannelHelper.sendLongMessage(event, "\n", keyList);
 				}
 			}
 		};
