@@ -1,6 +1,7 @@
 package weapons;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import java.util.List;
@@ -24,7 +25,7 @@ public class WeaponImpl implements Weapon{
 
 
 	private String name;
-	private int cost;
+	private int baseCost;
 	private int weight;
 	private String damage;
 	private CriticalRange critical;
@@ -36,7 +37,7 @@ public class WeaponImpl implements Weapon{
 	private String description;
 	private String url;
 	private List<String> weaponGroups;
-	//private final int cost;
+	//private final int baseCost;
 
 	public WeaponImpl(){
 
@@ -46,7 +47,7 @@ public class WeaponImpl implements Weapon{
 		this.name = content.getElementsByClass("title").get(0).text();
 		String text = content.html();
 		this.url = url;
-		cost = generateCost(text);
+		baseCost = generateCost(text);
 		weight = generateWeight(text);
 		damage = generateDamage(text);
 		critical = new CriticalRange(generateCritical(text));
@@ -150,7 +151,7 @@ public class WeaponImpl implements Weapon{
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("name", name)
-				.add("cost", cost)
+				.add("baseCost", baseCost)
 				.add("weight", weight)
 				.add("damage", damage)
 				.add("critical", critical)
@@ -165,10 +166,12 @@ public class WeaponImpl implements Weapon{
 	}
 
 
+	@JsonIgnore
 	public boolean isMasterWork() {
 		return false;
 	}
 
+	@JsonIgnore
 	public int getEnchantmentLevel() {
 		return 0;
 	}
@@ -220,15 +223,15 @@ public class WeaponImpl implements Weapon{
 
 
 	public int getBaseCost() {
-		return cost;
+		return baseCost;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setCost(int cost) {
-		this.cost = cost;
+	public void setBaseCost(int baseCost) {
+		this.baseCost = baseCost;
 	}
 
 	public void setWeight(int weight) {
@@ -279,7 +282,7 @@ public class WeaponImpl implements Weapon{
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		WeaponImpl weapon = (WeaponImpl) o;
-		return cost == weapon.cost &&
+		return baseCost == weapon.baseCost &&
 				weight == weapon.weight &&
 				Objects.equals(name, weapon.name) &&
 				Objects.equals(damage, weapon.damage) &&
@@ -295,6 +298,6 @@ public class WeaponImpl implements Weapon{
 	}
 
 	public int hashCode() {
-		return Objects.hash(name, cost, weight, damage, critical, range, type, special, category, proficiency, description, url, weaponGroups);
+		return Objects.hash(name, baseCost, weight, damage, critical, range, type, special, category, proficiency, description, url, weaponGroups);
 	}
 }

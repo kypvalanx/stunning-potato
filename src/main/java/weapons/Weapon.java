@@ -1,6 +1,7 @@
 package weapons;
 
 import behavior.Behavior;
+import behavior.ChannelHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.DeckList;
 import java.util.List;
@@ -33,7 +34,7 @@ public interface Weapon {
 								"WeaponImpl Groups: " + String.join(", ", getWeaponGroups()) + "\nDescription:\n"
 								+ getDescription();
 
-				event.getChannel().sendMessage(statBlock).queue();
+				ChannelHelper.sendLongMessage(event, "\n", statBlock);
 			}
 		};
 	}
@@ -52,6 +53,7 @@ public interface Weapon {
 
 	int getWeight();
 
+	@JsonIgnore
 	default int getCost() {
 		return getBaseCost() + (isMasterWork()? 300: 0)+ EnchantmentBonusModifiers.getEnchantmentCost(getEnchantmentLevel());
 	}
