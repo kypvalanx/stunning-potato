@@ -4,9 +4,21 @@ import behavior.Behavior;
 import behavior.BehaviorHelper;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.google.common.collect.Lists;
 import core.DeckList;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.collections4.MultiMapUtils;
@@ -19,19 +31,47 @@ import org.jsoup.select.Elements;
 public class WeaponsBehavior extends Behavior {
 	private final GroupBehavior
 			groupBehavior = new GroupBehavior();
+	private final Map<String, Weapon> weapons = new HashMap<>();
 	private final SetValuedMap<String, String> searchIndex = MultiMapUtils.newSetValuedHashMap();
 	private final SetValuedMap<String, String> groups = MultiMapUtils.newSetValuedHashMap();
 	private final SetValuedMap<String, String> category = MultiMapUtils.newSetValuedHashMap();
 	private final SetValuedMap<String, String> proficiency = MultiMapUtils.newSetValuedHashMap();
 
 	public WeaponsBehavior() {
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Simple");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Martial");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Exotic");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Ammo");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Firearm");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Mod");
-		getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Siege");
+		File resultFile = new File("resources/weapons.yaml");
+
+		if(resultFile.canRead()){
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+			TypeFactory typeFactory = mapper.getTypeFactory();
+
+			CollectionType mapType = typeFactory.constructCollectionType(ArrayList.class, WeaponImpl.class);
+
+			try {
+				List<WeaponImpl> weapons = mapper.readValue(resultFile, mapType);
+				weapons.forEach(this::addWeapon);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else
+		{
+
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Simple");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Martial");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Exotic");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Ammo");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Firearm");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Mod");
+			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Siege");
+
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+			try {
+				resultFile.createNewFile();
+				mapper.writeValue(resultFile, weapons.values());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		groupBehavior
 				.add("list", BehaviorHelper.getAlphabetizedList(searchIndex.values().stream().distinct().collect(Collectors.toList()), "Available Weapons"))
@@ -51,9 +91,7 @@ public class WeaponsBehavior extends Behavior {
 			e.printStackTrace();
 		}
 
-		Element body = doc.body();
-
-		Elements anchors = body.getElementsByTag("a");
+		Elements anchors = doc.body().getElementsByTag("a");
 
 
 		anchors.stream()
@@ -64,26 +102,33 @@ public class WeaponsBehavior extends Behavior {
 						Document description = Jsoup.connect("https://www.aonprd.com/" + descriptionURL).get();
 						Element content = description.body().getElementById("ctl00_MainContent_DataListTypes_ctl00_LabelName");
 
-						Weapon weapon = new Weapon(content, "https://www.aonprd.com/" + descriptionURL);
+						Weapon weapon = new WeaponImpl(content, "https://www.aonprd.com/" + descriptionURL);
 
-						groupBehavior.add(weapon.getName(), weapon.getWeaponStatBlockBehavior());
-
-						for (String subKey : weapon.getName().split(" ")) {
-							searchIndex.put(subKey.toLowerCase(), weapon.getName());
-						}
-						if (weapon.getCategory() != null) {
-							category.put(weapon.getCategory().toLowerCase(), weapon.getName());
-						}
-						proficiency.put(weapon.getProficiency().toLowerCase(), weapon.getName());
-						for (String group : weapon.getWeaponGroups()) {
-							groups.put(group.toLowerCase(), weapon.getName());
-						}
+						addWeapon(weapon);
 						//return weapon;
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 					//return null;
 				});
+
+
+	}
+
+	private void addWeapon(Weapon weapon) {
+		weapons.put(weapon.getName().toLowerCase(), weapon);
+		//groupBehavior.add(weapon.getName().toLowerCase(), weapon.getWeaponStatBlockBehavior());
+
+		for (String subKey : weapon.getName().toLowerCase().split(" ")) {
+			searchIndex.put(subKey, weapon.getName());
+		}
+		if (weapon.getCategory() != null) {
+			category.put(weapon.getCategory().toLowerCase(), weapon.getName());
+		}
+		proficiency.put(weapon.getProficiency().toLowerCase(), weapon.getName());
+		for (String group : weapon.getWeaponGroups()) {
+			groups.put(group.toLowerCase(), weapon.getName());
+		}
 	}
 
 	private Behavior getSearchBehavior(final SetValuedMap<String, String> searchIndex) {
@@ -107,6 +152,33 @@ public class WeaponsBehavior extends Behavior {
 
 	@Override
 	public void run(MessageReceivedEvent event, DeckList<String> message) {
+
+		List<String> payload = Lists.newArrayList(message.getDeck());
+
+		List<String> modifierKeys = new ArrayList<>();
+		List<String> weaopnOnly = payload.stream().map(new Function<String, String>() {
+			@Override
+			public String apply(String s) {
+				return s;
+			}
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+
+
+		Weapon weapon = weapons.get(String.join(" ", weaopnOnly).toLowerCase());
+
+		for(WeaponModifier mod : getWeaponModifiers(modifierKeys)){
+			weapon = mod.add(weapon);
+		}
+
+		if(weapon != null){
+			weapon.getWeaponStatBlockBehavior().run(event, message);
+			return;
+		}
+
 		groupBehavior.run(event, message);
+	}
+
+	private List<WeaponModifier> getWeaponModifiers(List<String> modifierKeys) {
+		return Lists.newArrayList();
 	}
 }

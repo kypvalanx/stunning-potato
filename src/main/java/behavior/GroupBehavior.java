@@ -2,16 +2,13 @@ package behavior;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import core.DeckList;
-import java.util.Objects;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.checkerframework.checker.units.qual.K;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class GroupBehavior extends Behavior {
     private String helpString;
@@ -92,13 +89,14 @@ public class GroupBehavior extends Behavior {
                 }
                 behaviors.put(path.toLowerCase(), new GroupBehavior(behavior));
             } else {
-                Behavior existing = behaviors.get(tokens[0]);
+                String first = tokens[0];
+                Behavior existing = behaviors.get(first);
                 if(existing == null){
                     existing = new GroupBehavior();
-                    behaviors.put(tokens[0].toLowerCase(), existing);
+                    behaviors.put(first.toLowerCase(), existing);
                 }
                 if(existing instanceof GroupBehavior){
-                    ((GroupBehavior)existing).add(new GroupBehavior(behavior), path.substring(tokens[0].length()+1));
+                    ((GroupBehavior)existing).add(new GroupBehavior(behavior), path.substring(first.length()+1));
                 }
             }
         }
