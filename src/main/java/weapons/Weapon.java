@@ -31,10 +31,10 @@ public interface Weapon {
 								"Cost: " + getCost() + " gp Weight: " + getWeight() + " lbs\n" +
 								"Damage: " + getDamage() + " Critical: " + getCritical() + " Range: " + getRange() + " Type: " + getType() + " Special: " + getSpecial() + "\n" +
 								"Category: " + getCategory() + " Proficiency: " + getProficiency() + "\n" +
-								"WeaponImpl Groups: " + String.join(", ", getWeaponGroups()) + "\nDescription:\n"
+								"Weapon Groups: " + String.join(", ", getWeaponGroups()) + "\nDescription:\n"
 								+ getDescription();
 
-				ChannelHelper.sendLongMessage(event, "\n", statBlock);
+				ChannelHelper.sendLongMessage(event, " ", statBlock);
 			}
 		};
 	}

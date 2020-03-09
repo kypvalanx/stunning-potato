@@ -143,7 +143,11 @@ public class WeaponImpl implements Weapon{
 		Matcher m = descriptionPattern.matcher(text);
 
 		if(m.find()) {
-			return m.group(1);
+			String group = m.group(1);
+			if(group.length() > 2000){
+				return url;
+			}
+			return group;
 		}
 		return null;
 	}
