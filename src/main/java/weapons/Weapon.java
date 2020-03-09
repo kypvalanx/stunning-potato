@@ -5,8 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.DeckList;
 import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import weapons.modifiers.EnchantmentBonusModifiers;
 
 public interface Weapon {
+	boolean isMasterWork();
+
+	int getEnchantmentLevel();
+
 	String getName();
 
 	String getCategory();
@@ -41,11 +46,15 @@ public interface Weapon {
 
 	String getRange();
 
-	String getCritical();
+	CriticalRange getCritical();
 
 	String getDamage();
 
 	int getWeight();
 
-	int getCost();
+	default int getCost() {
+		return getBaseCost() + (isMasterWork()? 300: 0)+ EnchantmentBonusModifiers.getEnchantmentCost(getEnchantmentLevel());
+	}
+
+	int getBaseCost();
 }

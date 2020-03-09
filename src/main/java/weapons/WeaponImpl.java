@@ -13,8 +13,8 @@ import org.jsoup.nodes.Element;
 public class WeaponImpl implements Weapon{
 	private static Pattern costPattern = Pattern.compile("<b>Cost</b> (\\d+) gp");
 	private static Pattern weightPattern = Pattern.compile("<b>Weight</b> (\\d+) lb");
-	private static Pattern damagePattern = Pattern.compile("<b>Damage</b> ([\\w,()\\s]+);");
-	private static Pattern criticalPattern = Pattern.compile("<b>Critical</b> ([\\w,()/\\s]+);");
+	private static Pattern damagePattern = Pattern.compile("<b>Damage</b> ([\\w,()\\s/]+);");
+	private static Pattern criticalPattern = Pattern.compile("<b>Critical</b> ([\\w,()/\\s-—\"]+);");
 	private static Pattern rangePattern = Pattern.compile("<b>Range</b> (\\d+) ft\\.;");
 	private static Pattern typePattern = Pattern.compile("<b>Type</b> ([\\w\\s]+);");
 	private static Pattern specialPattern = Pattern.compile("<b>Special</b> ([\\w\\s,]+)");
@@ -27,7 +27,7 @@ public class WeaponImpl implements Weapon{
 	private int cost;
 	private int weight;
 	private String damage;
-	private String critical;
+	private CriticalRange critical;
 	private String range;
 	private String type;
 	private String special;
@@ -49,7 +49,10 @@ public class WeaponImpl implements Weapon{
 		cost = generateCost(text);
 		weight = generateWeight(text);
 		damage = generateDamage(text);
-		critical = generateCritical(text);
+		critical = new CriticalRange(generateCritical(text));
+		if(critical.toString() == null){
+			System.err.println(text);
+		}
 		range = generateRange(text);
 		type = generateType(text);
 		special = generateSpecial(text);
@@ -144,7 +147,6 @@ public class WeaponImpl implements Weapon{
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("name", name)
@@ -163,6 +165,13 @@ public class WeaponImpl implements Weapon{
 	}
 
 
+	public boolean isMasterWork() {
+		return false;
+	}
+
+	public int getEnchantmentLevel() {
+		return 0;
+	}
 
 	public String getName() {
 		return name;
@@ -180,43 +189,37 @@ public class WeaponImpl implements Weapon{
 		return weaponGroups;
 	}
 
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public String getSpecial() {
 		return special;
 	}
 
-	@Override
 	public String getType() {
 		return type;
 	}
 
-	@Override
 	public String getRange() {
 		return range;
 	}
 
-	@Override
-	public String getCritical() {
+	public CriticalRange getCritical() {
 		return critical;
 	}
 
-	@Override
 	public String getDamage() {
 		return damage;
 	}
 
-	@Override
 	public int getWeight() {
 		return weight;
 	}
 
-	@Override
-	public int getCost() {
+
+
+	public int getBaseCost() {
 		return cost;
 	}
 
@@ -236,7 +239,7 @@ public class WeaponImpl implements Weapon{
 		this.damage = damage;
 	}
 
-	public void setCritical(String critical) {
+	public void setCritical(CriticalRange critical) {
 		this.critical = critical;
 	}
 
@@ -272,7 +275,6 @@ public class WeaponImpl implements Weapon{
 		this.weaponGroups = weaponGroups;
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -292,7 +294,6 @@ public class WeaponImpl implements Weapon{
 				Objects.equals(weaponGroups, weapon.weaponGroups);
 	}
 
-	@Override
 	public int hashCode() {
 		return Objects.hash(name, cost, weight, damage, critical, range, type, special, category, proficiency, description, url, weaponGroups);
 	}

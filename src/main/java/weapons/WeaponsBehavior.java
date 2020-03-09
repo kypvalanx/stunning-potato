@@ -27,6 +27,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import weapons.modifiers.WeaponModifier;
+import weapons.modifiers.WeaponModifiers;
 
 public class WeaponsBehavior extends Behavior {
 	private final GroupBehavior
@@ -155,22 +157,31 @@ public class WeaponsBehavior extends Behavior {
 
 		List<String> payload = Lists.newArrayList(message.getDeck());
 
-		List<String> modifierKeys = new ArrayList<>();
+		Map<String, WeaponModifier> allModifiers = getWeaponModifiers();
+
+		List<WeaponModifier> applicableModifiers = new ArrayList<>();
+
 		List<String> weaopnOnly = payload.stream().map(new Function<String, String>() {
 			@Override
 			public String apply(String s) {
-				return s;
+				WeaponModifier mod = allModifiers.get(s);
+
+				if(mod == null){
+					return s;
+				}
+				applicableModifiers.add(mod);
+				return null;
 			}
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 
 
 		Weapon weapon = weapons.get(String.join(" ", weaopnOnly).toLowerCase());
 
-		for(WeaponModifier mod : getWeaponModifiers(modifierKeys)){
-			weapon = mod.add(weapon);
-		}
-
 		if(weapon != null){
+		    for(WeaponModifier mod : applicableModifiers){
+		    	weapon = mod.add(weapon);
+		    }
+
 			weapon.getWeaponStatBlockBehavior().run(event, message);
 			return;
 		}
@@ -178,7 +189,7 @@ public class WeaponsBehavior extends Behavior {
 		groupBehavior.run(event, message);
 	}
 
-	private List<WeaponModifier> getWeaponModifiers(List<String> modifierKeys) {
-		return Lists.newArrayList();
+	private Map<String,WeaponModifier> getWeaponModifiers() {
+		return WeaponModifiers.get();
 	}
 }
