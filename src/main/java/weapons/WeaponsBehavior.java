@@ -57,7 +57,7 @@ public class WeaponsBehavior extends Behavior {
 			}
 		} else
 		{
-
+			System.out.println("You have no weapon data loaded, this will take a moment...");
 			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Simple");
 			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Martial");
 			getWeapons("https://www.aonprd.com/EquipmentWeapons.aspx?Proficiency=Exotic");
