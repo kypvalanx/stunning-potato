@@ -1,5 +1,6 @@
 package rebellion;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,11 +28,12 @@ public class Rebellion {
     private int secrecyOther;
     private int securityOther;
 
+    @JsonIgnore
     public String getSheet() {
         return "Rebellion Rank: " + getRebellionRank() + "\n" +
                 "Rebellion Max Level: " + getRebellionMaxLevel() + "\n" +
                 "Rebellion Members: " + getMembers() + "\n" +
-                "Rebellion Supporters: " + getRebellionSupporters() + "\n" +
+                "Rebellion Supporters: " + getSupporters() + "\n" +
                 getRebellion() + " Population: " + getPopulation() + "\n" +
                 "Rebellion Treasury: " + getTreasury() + "\n" +
                 "Rebellion Min Treasury: " + getMinTreasury() + "\n" +
@@ -137,14 +139,17 @@ public class Rebellion {
         return dangerRating;
     }
 
+    @JsonIgnore
     public int getLoyaltyBonus(){
         return getCheckBonus(Focus.LOYALTY) + getDemagogueConOrChaBonus() + getSentinelConOrChaBonus() + getLoyaltyOther();
     }
 
+    @JsonIgnore
     public int getSecrecyBonus(){
         return getCheckBonus(Focus.SECRECY) + getSpymasterDexOrIntBonus() + getSentinelDexOrIntBonus() + getSecrecyOther();
     }
 
+    @JsonIgnore
     public int getSecurityBonus(){
         return getCheckBonus(Focus.SECURITY) + getPartisanStrOrWisBonus() + getSentinelStrOrWisBonus() + getSecurityOther();
     }
@@ -159,6 +164,7 @@ public class Rebellion {
         return checkBonus;
     }
 
+    @JsonIgnore
     public int getSecondaryCheckBonus() {
         int rank = getRebellionRank();
 
@@ -166,6 +172,7 @@ public class Rebellion {
     }
 
     @NotNull
+    @JsonIgnore
     public int getFocusCheckBonus() {
         int rank = getRebellionRank();
 
@@ -173,23 +180,27 @@ public class Rebellion {
     }
 
     @NotNull
+    @JsonIgnore
     public String getAvailableActions() {
         return "Change Officer Role, Dismiss Team, Guarantee Event, Lie Low, Recruit Supporters, Recruit Team, Special Action, Upgrade Team";
     }
 
     @NotNull
+    @JsonIgnore
     public int getAvailableTeams() {
         //int rank = getRebellionRank();
         return 0;//(rank+11)/13+(rank+5)/12+(rank)/11+1;
     }
 
     @NotNull
+    @JsonIgnore
     public int getMaxTeams() {
         int rank = getRebellionRank();
         return (rank+14)/17+(rank+5)/10+(rank+5)/13+(rank)/11+2;
     }
 
     @NotNull
+    @JsonIgnore
     public int getActions() {
         int rank = getRebellionRank();
         return (rank+11)/13+(rank+5)/12+(rank)/11+1;
@@ -201,6 +212,7 @@ public class Rebellion {
     }
 
     @NotNull
+    @JsonIgnore
     public int getMinTreasury() {
         return getRebellionRank() * 10;
     }
@@ -215,6 +227,7 @@ public class Rebellion {
     }
 
     @NotNull
+    @JsonIgnore
     public String getRebellion() {
         return rebellionName;
     }
@@ -225,7 +238,7 @@ public class Rebellion {
     }
 
     @NotNull
-    public int getRebellionSupporters() {
+    public int getSupporters() {
         return supporters;
     }
 
@@ -238,8 +251,9 @@ public class Rebellion {
         return rebellionMaxLevel;
     }
 
+    @JsonIgnore
     public int getRebellionRank() {
-        int supporters = getRebellionSupporters();
+        int supporters = getSupporters();
         return Math.min(_getRank(supporters),rebellionMaxLevel);
     }
 

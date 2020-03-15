@@ -11,12 +11,13 @@ public abstract class Behavior {
 
     public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context)
     {
-        event.getChannel().sendMessage("No help available for ".concat(context).concat(".")).queue();
+        System.err.println("No help available for ".concat(context).concat("."));
     }
 
-    public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s)
+    public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key)
     {
-        event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s.getAll())).concat(".")).queue();
+        System.err.println(s.getAll() + key);
+        //event.getChannel().sendMessage("No detailed help available for ".concat(String.join(" ", s.getAll())).concat(key).concat(".")).queue();
     }
 
     public Behavior merge(Behavior that){

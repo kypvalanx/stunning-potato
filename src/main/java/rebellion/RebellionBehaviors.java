@@ -1,17 +1,19 @@
 package rebellion;
 
 import behavior.Behavior;
-import core.CoreListener;
+import behavior.NachoHelpBehavior;
 import core.DeckList;
 import core.DieParser;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class RebellionBehaviors {
+	private final Behavior followUpBehavior;
 	private Rebellion currentRebellion;
 
-	public RebellionBehaviors(Rebellion currentRebellion) {
+	public RebellionBehaviors(Rebellion currentRebellion, Behavior followUpBehavior) {
 		this.currentRebellion = currentRebellion;
+		this.followUpBehavior = followUpBehavior;
 	}
 
 	public void setCurrentRebellion(Rebellion currentRebellion) {
@@ -26,7 +28,13 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.addSupporters(-new DieParser().parseDieValue(message));
 
-				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
+				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
+				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
+				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"subtracts from supporters, accepts a die roll equation")).queue();
 			}
 		};
 	}
@@ -38,7 +46,12 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.addSupporters(new DieParser().parseDieValue(message));
 
-				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
+				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
+				followUpBehavior.run(event, message);
+			}
+			@Override
+			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
+				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"adds to supporters, accepts a die roll equation")).queue();
 			}
 		};
 	}
@@ -50,7 +63,13 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setSupporters(new DieParser().parseDieValue(message));
 
-				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getRebellionSupporters()).queue();
+				event.getChannel().sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
+				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
+				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"sets supporters, accepts a die roll equation")).queue();
 			}
 		};
 	}
@@ -64,6 +83,7 @@ public class RebellionBehaviors {
 				currentRebellion.addMembers(-new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -76,6 +96,7 @@ public class RebellionBehaviors {
 				currentRebellion.addMembers(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -88,6 +109,7 @@ public class RebellionBehaviors {
 				currentRebellion.setMembers(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -100,6 +122,7 @@ public class RebellionBehaviors {
 				currentRebellion.addNotoriety(-new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -112,6 +135,7 @@ public class RebellionBehaviors {
 				currentRebellion.addNotoriety(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -124,6 +148,7 @@ public class RebellionBehaviors {
 				currentRebellion.setNotoriety(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -136,6 +161,7 @@ public class RebellionBehaviors {
 				currentRebellion.addPopulation(-new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -148,6 +174,7 @@ public class RebellionBehaviors {
 				currentRebellion.addPopulation(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -160,6 +187,7 @@ public class RebellionBehaviors {
 				currentRebellion.setPopulation(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -172,6 +200,7 @@ public class RebellionBehaviors {
 				currentRebellion.addTreasury(-new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -184,6 +213,7 @@ public class RebellionBehaviors {
 				currentRebellion.addTreasury(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -196,6 +226,7 @@ public class RebellionBehaviors {
 				currentRebellion.setTreasury(new DieParser().parseDieValue(message));
 
 				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -208,6 +239,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setStrategist(message.getDeck());
 				event.getChannel().sendMessage("Strategist Available: " + currentRebellion.isHasStrategist()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -219,6 +251,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setSpyMaster(message.getDeck());
 				event.getChannel().sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterDexOrIntBonus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -230,6 +263,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setSentinal(message.getDeck());
 				event.getChannel().sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelConOrChaBonus() + ", " + currentRebellion.getSentinelStrOrWisBonus() + ", " + currentRebellion.getSentinelDexOrIntBonus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -241,6 +275,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setRecruiter(Integer.parseInt(message.getDeck().get(0)));
 				event.getChannel().sendMessage("Recruiter Level Set: " + currentRebellion.getRecruiterLvlBonus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -252,6 +287,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setPartisan(message.getDeck());
 				event.getChannel().sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanStrOrWisBonus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -263,6 +299,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setDemagogue(message.getDeck());
 				event.getChannel().sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueConOrChaBonus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -275,6 +312,7 @@ public class RebellionBehaviors {
 				Focus focus = Focus.valueOf(String.join(" ", message.getDeck()).toUpperCase());
 				currentRebellion.setFocus(focus);
 				event.getChannel().sendMessage("Focus Set: " + currentRebellion.getFocus()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}
@@ -286,6 +324,7 @@ public class RebellionBehaviors {
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setMaxRank(new DieParser().parseDieValue(message));
 				event.getChannel().sendMessage("Max Level Set: " + currentRebellion.getRebellionMaxLevel()).queue();
+				followUpBehavior.run(event, message);
 			}
 		};
 	}

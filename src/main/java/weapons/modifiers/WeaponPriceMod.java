@@ -1,19 +1,47 @@
 package weapons.modifiers;
 
 public class WeaponPriceMod {
-	private final String bonus;
-	private final WeaponPriveType type;
-	private final String[] keys;
-	private final String description;
+	public String getBonus() {
+		return bonus;
+	}
+
+	public WeaponPriveType getType() {
+		return type;
+	}
+
+	public String[] getKeys() {
+		return keys;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public WeaponPriceMod(){
+
+	}
+
+	private String bonus;
+	private WeaponPriveType type;
+	private String[] keys;
+	private String description;
 	private String url;
 
 	public WeaponPriceMod(String key, String bonus, String type, String description, String url) {
 		this.bonus = bonus;
 		this.type = WeaponPriveType.valueOf(type.toUpperCase());
-		if(key.contains(", ")){
+		if (key.contains(", ")) {
 			String[] tok = key.split(", ");
 			this.keys = new String[]{tok[1] + " " + tok[0], key};
-		}else{
+		} else {
 			this.keys = new String[]{key};
 		}
 		this.description = description;
@@ -25,8 +53,8 @@ public class WeaponPriceMod {
 	}
 
 	public WeaponModifier getWeaponMod() {
-		if(WeaponPriveType.BONUS.equals(type)){
-			return new WeaponModifier(){
+		if (WeaponPriveType.BONUS.equals(type)) {
+			return new WeaponModifier() {
 				@Override
 				public String getName() {
 					return keys[0] + " " + parent.getName();
@@ -38,17 +66,17 @@ public class WeaponPriceMod {
 				}
 
 				@Override
-				public String getDescription(){
+				public String getDescription() {
 					return parent.getDescription() + "\n\n" + description;
 				}
 
 				@Override
-				public String getUrl(){
+				public String getUrl() {
 					return url;
 				}
 			};
-		}else if(WeaponPriveType.GP.equals(type)){
-			return new WeaponModifier(){
+		} else if (WeaponPriveType.GP.equals(type)) {
+			return new WeaponModifier() {
 				@Override
 				public String getName() {
 					return keys[0] + " " + parent.getName();
@@ -60,12 +88,12 @@ public class WeaponPriceMod {
 				}
 
 				@Override
-				public String getDescription(){
+				public String getDescription() {
 					return parent.getDescription() + "\n\n" + description;
 				}
 			};
 		}
-		return new WeaponModifier(){
+		return new WeaponModifier() {
 
 		};
 	}

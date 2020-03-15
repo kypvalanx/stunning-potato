@@ -221,4 +221,24 @@ public class GroupBehavior extends Behavior {
     public void setHelpString(String helpString) {
         this.helpString = helpString;
     }
+
+    @Override
+    public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
+        if(s.canDraw()){
+            String token = s.draw();
+            Behavior behavior = behaviors.get(token);
+            if(behavior != null){
+                behavior.getDetailedHelp(event, s, key + " " + token);
+            }else{
+                super.getDetailedHelp(event, s, key);
+            }
+        }else {
+            if(defaultBehavior != null) {
+                defaultBehavior.getDetailedHelp(event, s, key);
+            }
+            for(Map.Entry<String, Behavior> behaviorEntry : behaviors.entrySet()){
+                behaviorEntry.getValue().getDetailedHelp(event, s, key + " " + behaviorEntry.getKey());
+            }
+        }
+    }
 }
