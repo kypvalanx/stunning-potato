@@ -82,4 +82,9 @@ public class WeaponModifier implements Weapon {
 	public int getBaseCost() {
 		return parent.getBaseCost();
 	}
+
+	@Override
+	public String getUrl() {
+		return null;
+	}
 }

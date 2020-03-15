@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.DeckList;
 import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import weapons.modifiers.EnchantmentBonusModifiers;
+import weapons.modifiers.WeaponModifiers;
 
 public interface Weapon {
 	boolean isMasterWork();
@@ -55,8 +55,10 @@ public interface Weapon {
 
 	@JsonIgnore
 	default int getCost() {
-		return getBaseCost() + (isMasterWork()? 300: 0)+ EnchantmentBonusModifiers.getEnchantmentCost(getEnchantmentLevel());
+		return getBaseCost() + (isMasterWork()? 300: 0)+ WeaponModifiers.getEnchantmentCost(getEnchantmentLevel());
 	}
 
 	int getBaseCost();
+
+	String getUrl();
 }

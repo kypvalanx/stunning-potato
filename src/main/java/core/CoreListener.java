@@ -82,7 +82,7 @@ public class CoreListener extends ListenerAdapter {
             final String contentRaw = event.getMessage().getContentRaw();
             final String key = contentRaw.toLowerCase().trim();
 
-            //ArrayList<String> tokens = new ArrayList<>(Arrays.asList(key.split(" ")));
+            //ArrayList<String> tokens = new ArrayList<>(Arrays.asList(keys.split(" ")));
             DeckList<String> message = new DeckList<>(Arrays.asList(key.split(" ")));
 
             if (currentContext == Context.DEFAULT) {
@@ -225,18 +225,18 @@ public class CoreListener extends ListenerAdapter {
             event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
         }
 //        else if(false){
-//            String key = String.join(" ", message.getDeck());
-//            Rebellion rebellion = getRebellion(key);
+//            String keys = String.join(" ", message.getDeck());
+//            Rebellion rebellion = getRebellion(keys);
 //            if (rebellion == null) {
-//                event.getChannel().sendMessage("I can't find the " + key + " rebellion").queue();
+//                event.getChannel().sendMessage("I can't find the " + keys + " rebellion").queue();
 //            } else {
 //                event.getChannel().sendMessage(rebellion.getSheet()).queue();
 //            }
 //        }
     }
 
-//    private Rebellion getRebellion(String key) {
-//        return rebellions.get(key);
+//    private Rebellion getRebellion(String keys) {
+//        return rebellions.get(keys);
 //    }
 
 }

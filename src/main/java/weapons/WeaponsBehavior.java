@@ -38,6 +38,7 @@ public class WeaponsBehavior extends Behavior {
 	private final SetValuedMap<String, String> groups = MultiMapUtils.newSetValuedHashMap();
 	private final SetValuedMap<String, String> category = MultiMapUtils.newSetValuedHashMap();
 	private final SetValuedMap<String, String> proficiency = MultiMapUtils.newSetValuedHashMap();
+	private final WeaponModifiers weaponModifiers = new WeaponModifiers();
 
 	public WeaponsBehavior() {
 		File resultFile = new File("resources/weapons.yaml");
@@ -80,7 +81,8 @@ public class WeaponsBehavior extends Behavior {
 				.add(new String[]{"search", "s"}, getSearchBehavior(searchIndex))
 				.add(new String[]{"category", "c"}, getSearchBehavior(category))
 				.add(new String[]{"proficiency", "p"}, getSearchBehavior(proficiency))
-				.add(new String[]{"group", "g"}, getSearchBehavior(groups));
+				.add(new String[]{"group", "g"}, getSearchBehavior(groups))
+		.add(new String[]{"mods"},  BehaviorHelper.getAlphabetizedList(weaponModifiers.getModifiers().keySet(), "Weapon Modifications"));
 
 
 	}
@@ -157,13 +159,28 @@ public class WeaponsBehavior extends Behavior {
 
 		List<String> payload = Lists.newArrayList(message.getDeck());
 
-		Map<String, WeaponModifier> allModifiers = getWeaponModifiers();
+		String combined = String.join(" ", payload);
+
+		Map<String, WeaponModifier> allModifiers = weaponModifiers.getModifiers();
+
+		for(String key : allModifiers.keySet()){
+			if(key.contains(" ")){
+				String underscored = key.replace(" ", "_");
+				combined = combined.replace(key, underscored);
+			}
+		}
+
+		payload = Lists.newArrayList(combined.split(" "));
 
 		List<WeaponModifier> applicableModifiers = new ArrayList<>();
 
-		List<String> weaopnOnly = payload.stream().map(new Function<String, String>() {
+		List<String> weaponOnly = payload.stream().map(new Function<String, String>() {
 			@Override
 			public String apply(String s) {
+				if (s.contains("_")){
+					s = s.replace("_", " ");
+				}
+
 				WeaponModifier mod = allModifiers.get(s);
 
 				if(mod == null){
@@ -175,7 +192,7 @@ public class WeaponsBehavior extends Behavior {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 
 
-		Weapon weapon = weapons.get(String.join(" ", weaopnOnly).toLowerCase());
+		Weapon weapon = weapons.get(String.join(" ", weaponOnly).toLowerCase());
 
 		if(weapon != null){
 		    for(WeaponModifier mod : applicableModifiers){
@@ -185,11 +202,15 @@ public class WeaponsBehavior extends Behavior {
 			weapon.getWeaponStatBlockBehavior().run(event, message);
 			return;
 		}
+		else{
+			WeaponModifier modifier = weaponModifiers.getModifiers().get(String.join(" ", message.getDeck()));
+
+			if(modifier != null) {
+				event.getChannel().sendMessage(modifier.getUrl()).queue();
+			}
+		}
 
 		groupBehavior.run(event, message);
 	}
 
-	private Map<String,WeaponModifier> getWeaponModifiers() {
-		return WeaponModifiers.get();
-	}
 }
