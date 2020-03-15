@@ -81,7 +81,7 @@ public class CoreListener extends ListenerAdapter {
 
 	@NotNull
 	private Rebellion getRebellion() {
-		File rebellionFile = new File("resources/rebellion.yaml");
+		File rebellionFile = new File("resources/save/rebellion.yaml");
 		if (rebellionFile.canRead()) {
 
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -96,7 +96,8 @@ public class CoreListener extends ListenerAdapter {
 	}
 
 	private void writeOutRebellion(){
-		File rebellionFile = new File("resources/rebellion.yaml");
+		new File("resources/save/").mkdir();
+		File rebellionFile = new File("resources/save/rebellion.yaml");
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 		try {
 			if(!rebellionFile.createNewFile()){
@@ -119,7 +120,7 @@ public class CoreListener extends ListenerAdapter {
 			final String contentRaw = event.getMessage().getContentRaw();
 			final String key = contentRaw.toLowerCase().trim();
 
-			//ArrayList<String> tokens = new ArrayList<>(Arrays.asList(keys.split(" ")));
+			//ArrayList<String> tokens = new ArrayList<>(Arrays.asList(getKeys.split(" ")));
 			DeckList<String> message = new DeckList<>(Arrays.asList(key.split(" ")));
 
 			if (currentContext == Context.DEFAULT) {
@@ -273,18 +274,18 @@ public class CoreListener extends ListenerAdapter {
 			event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
 		}
 //        else if(false){
-//            String keys = String.join(" ", message.getDeck());
-//            Rebellion rebellion = getRebellion(keys);
+//            String getKeys = String.join(" ", message.getDeck());
+//            Rebellion rebellion = getRebellion(getKeys);
 //            if (rebellion == null) {
-//                event.getChannel().sendMessage("I can't find the " + keys + " rebellion").queue();
+//                event.getChannel().sendMessage("I can't find the " + getKeys + " rebellion").queue();
 //            } else {
 //                event.getChannel().sendMessage(rebellion.getSheet()).queue();
 //            }
 //        }
 	}
 
-//    private Rebellion getRebellion(String keys) {
-//        return rebellions.get(keys);
+//    private Rebellion getRebellion(String getKeys) {
+//        return rebellions.get(getKeys);
 //    }
 
 }

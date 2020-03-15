@@ -1,39 +1,16 @@
 package weapons.modifiers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class WeaponPriceMod {
-	public String getBonus() {
-		return bonus;
-	}
-
-	public WeaponPriveType getType() {
-		return type;
-	}
-
-	public String[] getKeys() {
-		return keys;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public WeaponPriceMod(){
-
-	}
-
 	private String bonus;
 	private WeaponPriveType type;
 	private String[] keys;
 	private String description;
 	private String url;
+	public WeaponPriceMod() {
+
+	}
 
 	public WeaponPriceMod(String key, String bonus, String type, String description, String url) {
 		this.bonus = bonus;
@@ -48,10 +25,32 @@ public class WeaponPriceMod {
 		this.url = url;
 	}
 
-	public String[] keys() {
+	public String getBonus() {
+		return bonus;
+	}
+
+	public WeaponPriveType getType() {
+		return type;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+
+	public String[] getKeys() {
 		return keys;
 	}
 
+	@JsonIgnore
 	public WeaponModifier getWeaponMod() {
 		if (WeaponPriveType.BONUS.equals(type)) {
 			return new WeaponModifier() {

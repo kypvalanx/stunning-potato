@@ -41,7 +41,7 @@ public class WeaponsBehavior extends Behavior {
 	private final WeaponModifiers weaponModifiers = new WeaponModifiers();
 
 	public WeaponsBehavior() {
-		File resultFile = new File("resources/weapons.yaml");
+		File resultFile = new File("resources/generated/weapons.yaml");
 
 		if(resultFile.canRead()){
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -69,6 +69,7 @@ public class WeaponsBehavior extends Behavior {
 
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 			try {
+				new File("resources/generated/").mkdir();
 				resultFile.createNewFile();
 				mapper.writeValue(resultFile, weapons.values());
 			} catch (IOException e) {

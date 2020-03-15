@@ -37,7 +37,7 @@ public class KeyedBehavior extends Behavior {
 	public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context){
 
 		//NOOP
-		//event.getChannel().sendMessage(String.join(", ", keys) + "=>" + value).queue();
+		//event.getChannel().sendMessage(String.join(", ", getKeys) + "=>" + value).queue();
 	}
 
     public void setKeys(Set<String> keys) {
@@ -74,7 +74,7 @@ public class KeyedBehavior extends Behavior {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
-				.add("keys", keys)
+				.add("getKeys", keys)
 				.add("value", value)
 				.add("categories", categories)
 				.toString();

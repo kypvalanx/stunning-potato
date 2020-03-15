@@ -1,12 +1,21 @@
 package weapons.modifiers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,12 +29,12 @@ public class WeaponModifiers {
 	private Pattern descriptionPattern = Pattern.compile("DESCRIPTION ([\\s\\w<>/=\":.\\-,#'’();+–—\\[\\]%×]*) CONSTRUCTION REQUIREMENTS");
 	private Map<String, WeaponModifier> modifiers = new HashMap<>();
 
-	public WeaponModifiers(){
-		modifiers.put("+1", getEnchantmentBonus( 1));
+	public WeaponModifiers() {
+		modifiers.put("+1", getEnchantmentBonus(1));
 		modifiers.put("+2", getEnchantmentBonus(2));
-		modifiers.put("+3", getEnchantmentBonus( 3));
+		modifiers.put("+3", getEnchantmentBonus(3));
 		modifiers.put("+4", getEnchantmentBonus(4));
-		modifiers.put("+5", getEnchantmentBonus( 5));
+		modifiers.put("+5", getEnchantmentBonus(5));
 
 		modifiers.put("mwk", getMasterworkBonus());
 		modifiers.put("masterwork", getMasterworkBonus());
@@ -48,42 +57,75 @@ public class WeaponModifiers {
 	}
 
 	private void getEnchantments() {
-		Document doc = null;
-		try {
-			doc = Jsoup.connect("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/").get();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Element body = doc.body();
+		File resultFile = new File("resources/generated/weaponEnchantments.yaml");
 
-		Elements anchors = body.getElementsByTag("a");
+		if (resultFile.canRead()) {
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-		anchors.stream()
-				.filter(new Predicate<Element>() {
-					@Override
-					public boolean test(Element element) {
-						return element.attr("href").startsWith("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/")
-								&& !element.attr("href").equals("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/");
-					}
-				}).forEach(new Consumer<Element>() {
-			@Override
-			public void accept(Element element) {
-				try {
-					String url = element.attr("href");
-					Document sub = Jsoup.connect(url).get();
+			TypeFactory typeFactory = mapper.getTypeFactory();
 
-					Elements articleDiv = sub.getElementsByClass("article-content");
+			CollectionType mapType = typeFactory.constructCollectionType(ArrayList.class, WeaponPriceMod.class);
 
-					WeaponPriceMod price = getPrice(element.text(), articleDiv, url);
-					for(String key: price.keys()) {
-						modifiers.put(key, price.getWeaponMod());
-					}
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				List<WeaponPriceMod> weaponPriceMods = mapper.readValue(resultFile, mapType);
+				weaponPriceMods.forEach(this::addWeaponMod);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		});
+		} else {
+			System.out.println("You have no weapon enchantment data loaded, this will take a moment...");
+
+			try {
+				Document doc = null;
+				doc = Jsoup.connect("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/").get();
+				Element body = doc.body();
+
+				Elements anchors = body.getElementsByTag("a");
+
+
+				List<WeaponPriceMod> weaponModifiers = anchors.stream()
+						.filter(new Predicate<Element>() {
+							@Override
+							public boolean test(Element element) {
+								return element.attr("href").startsWith("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/")
+										&& !element.attr("href").equals("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/");
+							}
+						}).map(new Function<Element, WeaponPriceMod>() {
+							@Override
+							public WeaponPriceMod apply(Element element) {
+								try {
+									String url = element.attr("href");
+									Document sub = Jsoup.connect(url).get();
+
+									Elements articleDiv = sub.getElementsByClass("article-content");
+
+									return getPrice(element.text(), articleDiv, url);
+
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								return null;
+							}
+						}).collect(Collectors.toList());
+				weaponModifiers.forEach(this::addWeaponMod);
+				ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+
+				new File("resources/generated/").mkdir();
+				resultFile.createNewFile();
+				mapper.writeValue(resultFile, weaponModifiers);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private void addWeaponMod(WeaponPriceMod price) {
+		for (String key : price.getKeys()) {
+			modifiers.put(key, price.getWeaponMod());
+		}
 	}
 
 	private WeaponPriceMod getPrice(String key, Elements articleDiv, String url) {
@@ -95,14 +137,14 @@ public class WeaponModifiers {
 
 		Matcher descriptionMatcher = descriptionPattern.matcher(text);
 		String description = "";
-		if(descriptionMatcher.find()){
+		if (descriptionMatcher.find()) {
 			description = descriptionMatcher.group(1);
-		}else{
+		} else {
 			System.out.println(nodes);
 		}
 		price.find();
 
-			//System.out.println(price.group(1) + " " + price.group(2));
+		//System.out.println(price.group(1) + " " + price.group(2));
 
 		return new WeaponPriceMod(key.toLowerCase(), price.group(1), price.group(2), description, url);
 	}
@@ -124,7 +166,7 @@ public class WeaponModifiers {
 			}
 
 			@Override
-			public String getUrl(){
+			public String getUrl() {
 				return "https://www.d20pfsrd.com/equipment/weapons#TOC-Masterwork-Weapons";
 			}
 		};
@@ -144,7 +186,7 @@ public class WeaponModifiers {
 			}
 
 			@Override
-			public String getUrl(){
+			public String getUrl() {
 				return "https://www.d20pfsrd.com/magic-items/magic-weapons/";
 			}
 
@@ -156,6 +198,6 @@ public class WeaponModifiers {
 	}
 
 	public static int getEnchantmentCost(int enchantmentLevel) {
-		return (int)(Math.pow(enchantmentLevel, 2) * 2000);
+		return (int) (Math.pow(enchantmentLevel, 2) * 2000);
 	}
 }
