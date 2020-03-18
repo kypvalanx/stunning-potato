@@ -1,5 +1,6 @@
 package core;
 
+import armor.ArmorBehavior;
 import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
@@ -10,6 +11,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import pack.PackBehavior;
 import rebellion.Rebellion;
 import rebellion.RebellionBehaviors;
 import rebellion.events.RebellionEvent;
@@ -56,7 +58,9 @@ public class CoreListener extends ListenerAdapter {
                 .add("dc", dc)
                 .add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
                 .add(new String[]{"item","!i"}, new ItemBehavior())
-                .add(new String[]{"weapon", "!w"}, new WeaponsBehavior());
+                .add(new String[]{"weapon", "!w"}, new WeaponsBehavior())
+                .add(new String[]{"pack", "!p"}, new PackBehavior())
+                .add(new String[]{"armor", "!a"}, new ArmorBehavior());
 
         Behavior help = new NachoHelpBehavior(primaryContext);
         primaryContext.add(help, "help");
