@@ -74,4 +74,13 @@ public class Variables {
 					}
 				});
 	}
+
+	public static String findVariable(String key) {
+		String value = get(key);
+
+		if (value == null) {
+			throw new IllegalStateException("couldn't find " + key);
+		}
+		return value;
+	}
 }

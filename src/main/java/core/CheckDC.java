@@ -64,4 +64,14 @@ public class CheckDC {
 					}
 				});
 	}
+
+	public static void attemptCheck(MessageReceivedEvent event, int roll) {
+		if (hasDC()) {
+			if (roll < getDC()) {
+				event.getChannel().sendMessage("Check Failed! " + getFailureMessage()).queue();
+			} else {
+				event.getChannel().sendMessage("Check Passed!").queue();
+			}
+		}
+	}
 }

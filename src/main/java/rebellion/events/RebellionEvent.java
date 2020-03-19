@@ -2,7 +2,7 @@ package rebellion.events;
 
 import behavior.Behavior;
 import core.DeckList;
-import core.DieParser;
+import static core.DieParser.rollDice;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import rebellion.Rebellion;
@@ -550,13 +550,7 @@ public interface RebellionEvent {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				int eventNumber;
-				if (!message.canDraw()) {
-					final DieParser dieParser = new DieParser();
-					eventNumber = dieParser.parseDieValue("1d100" + "+" + rebellion.getDangerRating());
-				} else {
-					eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
-				}
+				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
 				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
@@ -573,17 +567,19 @@ public interface RebellionEvent {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				int eventNumber;
-				if (!message.canDraw()) {
-					final DieParser dieParser = new DieParser();
-					eventNumber = dieParser.parseDieValue("1d100" + "+" + rebellion.getDangerRating());
-				} else {
-					eventNumber = Integer.parseInt(String.join(" ", message.getDeck()));
-				}
+				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
 				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
 			}
 		};
+	}
+
+	static int getEventNumber(DeckList<String> message, Rebellion rebellion) {
+		if (!message.canDraw()) {
+			return rollDice("1d100" + "+" + rebellion.getDangerRating()).getSum();
+		} else {
+			return Integer.parseInt(String.join(" ", message.getDeck()));
+		}
 	}
 }

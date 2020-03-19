@@ -5,6 +5,7 @@ import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
+import static core.DieParser.rollDice;
 import items.ItemBehavior;
 import java.util.Arrays;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -133,14 +134,16 @@ public class CoreListener extends ListenerAdapter {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				final DieParser dieParser = new DieParser();
+				DieResult dieResult;
 				if (!message.canDraw()) {
-					event.getChannel().sendMessage(" " + dieParser.parseDieValue("1d20+" + bonus)).queue();
+					dieResult = rollDice("1d20+" + bonus);
+					event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
 				} else {
-					event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message.getDeck()) + "+" + bonus)).queue();
+					dieResult = rollDice(String.join(" ", message.getDeck()) + "+" + bonus);
+					event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
 				}
-				event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
-				attemptCheck(event, dieParser.getRoll());
+				event.getChannel().sendMessage(" " + dieResult.getSteps()).queue();
+				CheckDC.attemptCheck(event, dieResult.getSum());
 			}
 		};
 	}
@@ -151,22 +154,12 @@ public class CoreListener extends ListenerAdapter {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				final DieParser dieParser = new DieParser();
-				final int roll = dieParser.parseDieValue(message);
-				event.getChannel().sendMessage(" " + roll).queue();
-				ChannelHelper.sendLongMessage(event, " ", dieParser.getSteps());
-				attemptCheck(event, roll);
+				DieResult dieResult = rollDice(message);
+				event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
+				ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
+				CheckDC.attemptCheck(event, dieResult.getSum());
 			}
 		};
 	}
 
-	private void attemptCheck(MessageReceivedEvent event, int roll) {
-		if (CheckDC.hasDC()) {
-			if (roll < CheckDC.getDC()) {
-				event.getChannel().sendMessage("Check Failed! " + CheckDC.getFailureMessage()).queue();
-			} else {
-				event.getChannel().sendMessage("Check Passed!").queue();
-			}
-		}
-	}
 }

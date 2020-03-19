@@ -1,84 +1,62 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
+import org.jetbrains.annotations.NotNull;
 
 public class DieParser {
-	private final List<String> steps = new ArrayList<>();
-	private int sum;
+	private static final List<Integer> steps = new ArrayList<>();
+	private static final Random RAND = new Random();
 
-	public DieParser() {
+	public static DieResult rollDice(DeckList<String> dieEquation) {
+		return rollDice(String.join(" ", dieEquation.getDeck()));
 	}
 
-	public int parseDieValue(DeckList<String> message) {
+	public static DieResult rollDice(@NotNull String dieEquation) {
 
-		return parseDieValue(String.join(" ", message.getDeck()));
-	}
-
-	public int parseDieValue(String payload) {
-		if (payload.startsWith("roll ")) {
-			throw new RuntimeException("parse Die Value being called with dirty payload: " + payload);
+		if (dieEquation.startsWith("roll ")) {
+			throw new RuntimeException("getValue Die Value being called with dirty payload: " + dieEquation);
 		}
-		String digest = payload.replace("-", "+-");
+		String digest = dieEquation.replace("-", "+-");
 		String[] values = digest.split("\\+");
 
-		sum = 0;
+		int sum = Arrays.stream(values)
+				.map(String::trim)
+				.map(value -> {
+					int subtract = 1;
+					if (value.startsWith("-")) {
+						value = value.substring(1);
+						subtract = -1;
+					}
+					return getValue(value.trim(), subtract);
+				}).reduce(0, (integer, integer2) -> integer + integer2);
 
-		for (String value : values) {
-			int subtract = 1;
-			if (value.startsWith("-")) {
-				value = value.substring(1);
-				subtract = -1;
-			}
-			value = value.trim();
-			int parsed;
-			if (value.matches("\\d*d\\d+")) {
-				parsed = parseDie(value) * subtract;
-			} else if (value.matches("\\d+")) {
-				parsed = Integer.parseInt(value) * subtract;
-				steps.add("" + parsed);
-			} else {
-				parsed = findVariable(value) * subtract;
-			}
-			sum += parsed;
-		}
-
-		return sum;
+		return new DieResult(sum, "{ " + String.join(" + ", " " + DieParser.steps).replace(" + -", " - ") + " }");
 	}
 
-	private int findVariable(String key) {
-		String value = Variables.get(key);
-
-		if (value == null) {
-			throw new IllegalStateException("couldn't find " + key);
+	private static int getValue(String value, int subtract) {
+		if (value.matches("\\d*d\\d+")) {
+			return parseDieExpression(value) * subtract;
+		} else if (value.matches("\\d+")) {
+			int parsed = Integer.parseInt(value) * subtract;
+			steps.add(parsed);
+			return parsed;
 		}
-		return parseDieValue(value);
+		return rollDice(Variables.findVariable(value)).getSum() * subtract;
 	}
 
-	private int parseDie(String value) {
+	private static int parseDieExpression(String value) {
 		String[] tokens = value.split("d");
-		if (tokens[0].isBlank()) {
-			tokens[0] = "1";
-		}
-		int times = Integer.parseInt(tokens[0]);
+		int times = tokens[0].isBlank()? 1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);
-		Random rand = new Random();
 		return IntStream.range(0, times).parallel().map(i -> {
-					int roll = rand.nextInt(size) + 1;
-					steps.add("" + roll);
+					int roll = RAND.nextInt(size) + 1;
+					steps.add(roll);
 					return roll;
 				}
 		).reduce(0, (left, right) -> left + right);
-	}
-
-	public String getSteps() {
-		return "{ " + String.join(" + ", steps).replace(" + -", " - ") + " }";
-
-	}
-
-	public int getRoll() {
-		return sum;
 	}
 }
