@@ -1,11 +1,17 @@
 package rebellion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class Rebellion {
-    private int supporters = 0;
+	private static final String DEFAULT_RESOURCE_FILE = "resources/save/rebellion.yaml";
+	private int supporters = 0;
     private int treasury = 0;
     private int population = 0;
     private String rebellionName = "Kintargo";
@@ -28,7 +34,38 @@ public class Rebellion {
     private int secrecyOther;
     private int securityOther;
 
-    @JsonIgnore
+	@NotNull
+	public static Rebellion getRebellionFromFile() {
+		File rebellionFile = new File(DEFAULT_RESOURCE_FILE);
+		if (rebellionFile.canRead()) {
+
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+			try {
+				return mapper.readValue(rebellionFile, Rebellion.class);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return new Rebellion();
+	}
+
+	public static void writeOutRebellionToFile(Rebellion rebellion){
+		new File("resources/save/").mkdir();
+		File rebellionFile = new File(DEFAULT_RESOURCE_FILE);
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+		try {
+			if(!rebellionFile.createNewFile()){
+				rebellionFile.delete();
+				rebellionFile.createNewFile();
+			}
+			mapper.writeValue(rebellionFile, rebellion);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@JsonIgnore
     public String getSheet() {
         return "Rebellion Rank: " + getRebellionRank() + "\n" +
                 "Rebellion Max Level: " + getRebellionMaxLevel() + "\n" +

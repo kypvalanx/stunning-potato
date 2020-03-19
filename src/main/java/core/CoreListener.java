@@ -5,14 +5,8 @@ import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import items.ItemBehavior;
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Map;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -26,88 +20,36 @@ import weapons.WeaponsBehavior;
 public class CoreListener extends ListenerAdapter {
 	private final GroupBehavior primaryContext;
 	private final GroupBehavior defaultContext;
-	//private Map<String, Rebellion> rebellions;
 	private Rebellion currentRebellion;
 	private Context currentContext = Context.DEFAULT;
 
 	public CoreListener() {
-		currentRebellion = getRebellion();
-
-		Behavior dc = new GroupBehavior()
-				.setDefault(new Behavior() {
-					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						if (!CheckDC.hasDC()) {
-							event.getChannel().sendMessage("No current set DC.").queue();
-						} else {
-							event.getChannel().sendMessage("The Next die roll will be checked against DC " + CheckDC.peek()).queue();
-						}
-					}
-				})
-				.add("set", new Behavior() {
-					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						CheckDC.setDC(Integer.parseInt(message.draw()));
-						if (message.canDraw()) {
-							CheckDC.setFailureMessage(String.join(" ", message.getDeck()));
-						}
-						event.getChannel().sendMessage("The Next die roll will be checked against DC " + CheckDC.peek()).queue();
-					}
-				});
+		currentRebellion = Rebellion.getRebellionFromFile();
 
 		primaryContext = new GroupBehavior()
 				.add(new String[]{"rebellion", "r"}, getRebellionBehavior())
-				.add(getRollBehavior(), "roll")
-				.add(getVarBehavior(), "var")
-				.add("dc", dc)
+				.add(new String[]{"roll"}, getRollBehavior())
+				.add(new String[]{"var"}, Variables.getVarBehavior())
+				.add(new String[]{"dc"}, CheckDC.getDCBehavior())
 				.add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
 				.add(new String[]{"item", "!i"}, new ItemBehavior())
 				.add(new String[]{"weapon", "!w"}, new WeaponsBehavior())
-                .add(new String[]{"pack", "!p"}, new PackBehavior())
-                .add(new String[]{"armor", "!a"}, new ArmorBehavior());
+				.add(new String[]{"pack", "!p"}, new PackBehavior())
+				.add(new String[]{"armor", "!a"}, new ArmorBehavior());
+		primaryContext
+				.add(new String[]{"help"}, new NachoHelpBehavior(primaryContext));
+		defaultContext = new GroupBehavior()
+				.add(new String[]{"quit", "exit"}, getExitContextBehavior());
+	}
 
-		Behavior help = new NachoHelpBehavior(primaryContext);
-		primaryContext.add(help, "help");
-
-
-		defaultContext = new GroupBehavior().add((new Behavior() {
+	@NotNull
+	private Behavior getExitContextBehavior() {
+		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentContext = Context.DEFAULT;
 			}
-		}), "quit", "exit");
-
-	}
-
-	@NotNull
-	private Rebellion getRebellion() {
-		File rebellionFile = new File("resources/save/rebellion.yaml");
-		if (rebellionFile.canRead()) {
-
-			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
-			try {
-				return mapper.readValue(rebellionFile, Rebellion.class);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return new Rebellion();
-	}
-
-	private void writeOutRebellion(){
-		new File("resources/save/").mkdir();
-		File rebellionFile = new File("resources/save/rebellion.yaml");
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
-		try {
-			if(!rebellionFile.createNewFile()){
-				rebellionFile.delete();
-				rebellionFile.createNewFile();
-			}
-			mapper.writeValue(rebellionFile, currentRebellion);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		};
 	}
 
 
@@ -117,10 +59,8 @@ public class CoreListener extends ListenerAdapter {
 			return;
 		}
 		try {
-			final String contentRaw = event.getMessage().getContentRaw();
-			final String key = contentRaw.toLowerCase().trim();
+			final String key = event.getMessage().getContentRaw().toLowerCase().trim();
 
-			//ArrayList<String> tokens = new ArrayList<>(Arrays.asList(getKeys.split(" ")));
 			DeckList<String> message = new DeckList<>(Arrays.asList(key.split(" ")));
 
 			if (currentContext == Context.DEFAULT) {
@@ -133,12 +73,11 @@ public class CoreListener extends ListenerAdapter {
 		}
 	}
 
-
 	private GroupBehavior getRebellionBehavior() {
 		Behavior updateRebellion = new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				writeOutRebellion();
+				Rebellion.writeOutRebellionToFile(currentRebellion);
 			}
 		};
 		RebellionBehaviors rebellionBehaviors = new RebellionBehaviors(currentRebellion, updateRebellion);
@@ -148,7 +87,9 @@ public class CoreListener extends ListenerAdapter {
 				.setDefault(new Behavior() {
 					@Override
 					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						handleRebellionSheet(event, message);
+						if (!message.canDraw()) {
+							event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
+						}
 					}
 
 					@Override
@@ -214,7 +155,7 @@ public class CoreListener extends ListenerAdapter {
 				final int roll = dieParser.parseDieValue(message);
 				event.getChannel().sendMessage(" " + roll).queue();
 				ChannelHelper.sendLongMessage(event, " ", dieParser.getSteps());
-				CoreListener.this.attemptCheck(event, roll);
+				attemptCheck(event, roll);
 			}
 		};
 	}
@@ -228,64 +169,4 @@ public class CoreListener extends ListenerAdapter {
 			}
 		}
 	}
-
-	private Behavior getVarBehavior() {
-		return new GroupBehavior()
-				.add(new Behavior() {
-					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						String key = message.draw();
-						String value = String.join(" ", message.getDeck());
-						if (value.isBlank()) {
-							event.getChannel().sendMessage("variable " + key + " requires value").queue();
-						} else {
-							Variables.put(key, value);
-							event.getChannel().sendMessage(key + " => " + value + " saved").queue();
-						}
-					}
-				}, "add")
-				.add(new Behavior() {
-					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						String key = message.draw();
-						if (Variables.containsKey(key)) {
-							Variables.remove(key);
-							event.getChannel().sendMessage("variable '" + key + "' removed").queue();
-						} else {
-							event.getChannel().sendMessage("variable '" + key + "' doesn't exist").queue();
-						}
-					}
-				}, "remove")
-				.add(new Behavior() {
-					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
-						StringBuilder builder = new StringBuilder();
-						for (Map.Entry<String, String> entry : Variables.entrySet()) {
-							builder.append(entry.getKey()).append(" => ").append(entry.getValue()).append("\n");
-						}
-						event.getChannel().sendMessage(builder.toString()).queue();
-					}
-				}, "list");
-	}
-
-
-	private void handleRebellionSheet(@NotNull MessageReceivedEvent event, DeckList<String> message) {
-		if (!message.canDraw()) {
-			event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
-		}
-//        else if(false){
-//            String getKeys = String.join(" ", message.getDeck());
-//            Rebellion rebellion = getRebellion(getKeys);
-//            if (rebellion == null) {
-//                event.getChannel().sendMessage("I can't find the " + getKeys + " rebellion").queue();
-//            } else {
-//                event.getChannel().sendMessage(rebellion.getSheet()).queue();
-//            }
-//        }
-	}
-
-//    private Rebellion getRebellion(String getKeys) {
-//        return rebellions.get(getKeys);
-//    }
-
 }
