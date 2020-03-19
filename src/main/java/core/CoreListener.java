@@ -27,7 +27,7 @@ public class CoreListener extends ListenerAdapter {
 		currentRebellion = Rebellion.getRebellionFromFile();
 
 		primaryContext = new GroupBehavior()
-				.add(new String[]{"rebellion", "r"}, getRebellionBehavior())
+				.add(new String[]{"rebellion", "!r"}, getRebellionBehavior())
 				.add(new String[]{"roll"}, getRollBehavior())
 				.add(new String[]{"var"}, Variables.getVarBehavior())
 				.add(new String[]{"dc"}, CheckDC.getDCBehavior())
@@ -129,18 +129,18 @@ public class CoreListener extends ListenerAdapter {
 
 
 	@NotNull
-	public Behavior getRollCheckBehavior(int loyaltyBonus) {
+	public Behavior getRollCheckBehavior(int bonus) {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				final DieParser dieParser = new DieParser();
 				if (!message.canDraw()) {
-					event.getChannel().sendMessage(" " + dieParser.parseDieValue("1d20+" + loyaltyBonus)).queue();
+					event.getChannel().sendMessage(" " + dieParser.parseDieValue("1d20+" + bonus)).queue();
 				} else {
-					event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message.getDeck()) + "+" + loyaltyBonus)).queue();
+					event.getChannel().sendMessage(" " + dieParser.parseDieValue(String.join(" ", message.getDeck()) + "+" + bonus)).queue();
 				}
 				event.getChannel().sendMessage(" " + dieParser.getSteps()).queue();
-				CoreListener.this.attemptCheck(event, dieParser.getRoll());
+				attemptCheck(event, dieParser.getRoll());
 			}
 		};
 	}
