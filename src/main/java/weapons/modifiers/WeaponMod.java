@@ -2,17 +2,17 @@ package weapons.modifiers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class WeaponPriceMod {
+public class WeaponMod {
 	private String bonus;
 	private WeaponPriveType type;
 	private String[] keys;
 	private String description;
 	private String url;
-	public WeaponPriceMod() {
+	public WeaponMod() {
 
 	}
 
-	public WeaponPriceMod(String key, String bonus, String type, String description, String url) {
+	public WeaponMod(String key, String bonus, String type, String description, String url) {
 		this.bonus = bonus;
 		this.type = WeaponPriveType.valueOf(type.toUpperCase());
 		if (key.contains(", ")) {
@@ -20,6 +20,10 @@ public class WeaponPriceMod {
 			this.keys = new String[]{tok[1] + " " + tok[0], key};
 		} else {
 			this.keys = new String[]{key};
+		}
+
+		if(description.contains("points of damage")){
+			System.err.println(description);
 		}
 		this.description = description;
 		this.url = url;
@@ -51,9 +55,9 @@ public class WeaponPriceMod {
 	}
 
 	@JsonIgnore
-	public WeaponModifier getWeaponMod() {
+	public WeaponBaseMod getWeaponMod() {
 		if (WeaponPriveType.BONUS.equals(type)) {
-			return new WeaponModifier() {
+			return new WeaponBaseMod() {
 				@Override
 				public String getName() {
 					return keys[0] + " " + parent.getName();
@@ -75,7 +79,7 @@ public class WeaponPriceMod {
 				}
 			};
 		} else if (WeaponPriveType.GP.equals(type)) {
-			return new WeaponModifier() {
+			return new WeaponBaseMod() {
 				@Override
 				public String getName() {
 					return keys[0] + " " + parent.getName();
@@ -92,7 +96,7 @@ public class WeaponPriceMod {
 				}
 			};
 		}
-		return new WeaponModifier() {
+		return new WeaponBaseMod() {
 
 		};
 	}

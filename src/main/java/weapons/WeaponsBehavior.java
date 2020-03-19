@@ -27,7 +27,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import weapons.modifiers.WeaponModifier;
+import weapons.modifiers.WeaponBaseMod;
 import weapons.modifiers.WeaponModifiers;
 
 public class WeaponsBehavior extends Behavior {
@@ -162,7 +162,7 @@ public class WeaponsBehavior extends Behavior {
 
 		String combined = String.join(" ", payload);
 
-		Map<String, WeaponModifier> allModifiers = weaponModifiers.getModifiers();
+		Map<String, WeaponBaseMod> allModifiers = weaponModifiers.getModifiers();
 
 		for(String key : allModifiers.keySet()){
 			if(key.contains(" ")){
@@ -173,7 +173,7 @@ public class WeaponsBehavior extends Behavior {
 
 		payload = Lists.newArrayList(combined.split(" "));
 
-		List<WeaponModifier> applicableModifiers = new ArrayList<>();
+		List<WeaponBaseMod> applicableModifiers = new ArrayList<>();
 
 		List<String> weaponOnly = payload.stream().map(new Function<String, String>() {
 			@Override
@@ -182,7 +182,7 @@ public class WeaponsBehavior extends Behavior {
 					s = s.replace("_", " ");
 				}
 
-				WeaponModifier mod = allModifiers.get(s);
+				WeaponBaseMod mod = allModifiers.get(s);
 
 				if(mod == null){
 					return s;
@@ -196,7 +196,7 @@ public class WeaponsBehavior extends Behavior {
 		Weapon weapon = weapons.get(String.join(" ", weaponOnly).toLowerCase());
 
 		if(weapon != null){
-		    for(WeaponModifier mod : applicableModifiers){
+		    for(WeaponBaseMod mod : applicableModifiers){
 		    	weapon = mod.add(weapon);
 		    }
 
@@ -204,7 +204,7 @@ public class WeaponsBehavior extends Behavior {
 			return;
 		}
 		else{
-			WeaponModifier modifier = weaponModifiers.getModifiers().get(String.join(" ", message.getDeck()));
+			WeaponBaseMod modifier = weaponModifiers.getModifiers().get(String.join(" ", message.getDeck()));
 
 			if(modifier != null) {
 				event.getChannel().sendMessage(modifier.getUrl()).queue();

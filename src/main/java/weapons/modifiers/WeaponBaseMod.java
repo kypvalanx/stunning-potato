@@ -5,7 +5,7 @@ import java.util.List;
 import weapons.CriticalRange;
 import weapons.Weapon;
 
-public class WeaponModifier implements Weapon {
+public class WeaponBaseMod implements Weapon {
 
 	protected Weapon parent;
 

@@ -27,7 +27,7 @@ public class WeaponModifiers {
 
 	private Pattern pricePattern = Pattern.compile("<b>price</b>\\s+\\+([\\d,]+)\\s+(bonus|gp)");
 	private Pattern descriptionPattern = Pattern.compile("DESCRIPTION ([\\s\\w<>/=\":.\\-,#'’();+–—\\[\\]%×]*) CONSTRUCTION REQUIREMENTS");
-	private Map<String, WeaponModifier> modifiers = new HashMap<>();
+	private Map<String, WeaponBaseMod> modifiers = new HashMap<>();
 
 	public WeaponModifiers() {
 		modifiers.put("+1", getEnchantmentBonus(1));
@@ -52,7 +52,7 @@ public class WeaponModifiers {
 
 	}
 
-	public Map<String, WeaponModifier> getModifiers() {
+	public Map<String, WeaponBaseMod> getModifiers() {
 		return modifiers;
 	}
 
@@ -64,11 +64,11 @@ public class WeaponModifiers {
 
 			TypeFactory typeFactory = mapper.getTypeFactory();
 
-			CollectionType mapType = typeFactory.constructCollectionType(ArrayList.class, WeaponPriceMod.class);
+			CollectionType mapType = typeFactory.constructCollectionType(ArrayList.class, WeaponMod.class);
 
 			try {
-				List<WeaponPriceMod> weaponPriceMods = mapper.readValue(resultFile, mapType);
-				weaponPriceMods.forEach(this::addWeaponMod);
+				List<WeaponMod> weaponMods = mapper.readValue(resultFile, mapType);
+				weaponMods.forEach(this::addWeaponMod);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -83,16 +83,16 @@ public class WeaponModifiers {
 				Elements anchors = body.getElementsByTag("a");
 
 
-				List<WeaponPriceMod> weaponModifiers = anchors.stream()
+				List<WeaponMod> weaponModifiers = anchors.stream()
 						.filter(new Predicate<Element>() {
 							@Override
 							public boolean test(Element element) {
 								return element.attr("href").startsWith("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/")
 										&& !element.attr("href").equals("https://www.d20pfsrd.com/magic-items/magic-weapons/magic-weapon-special-abilities/");
 							}
-						}).map(new Function<Element, WeaponPriceMod>() {
+						}).map(new Function<Element, WeaponMod>() {
 							@Override
-							public WeaponPriceMod apply(Element element) {
+							public WeaponMod apply(Element element) {
 								try {
 									String url = element.attr("href");
 									Document sub = Jsoup.connect(url).get();
@@ -122,13 +122,13 @@ public class WeaponModifiers {
 
 	}
 
-	private void addWeaponMod(WeaponPriceMod price) {
+	private void addWeaponMod(WeaponMod price) {
 		for (String key : price.getKeys()) {
 			modifiers.put(key, price.getWeaponMod());
 		}
 	}
 
-	private WeaponPriceMod getPrice(String key, Elements articleDiv, String url) {
+	private WeaponMod getPrice(String key, Elements articleDiv, String url) {
 
 		String nodes = articleDiv.html();
 
@@ -146,12 +146,12 @@ public class WeaponModifiers {
 
 		//System.out.println(price.group(1) + " " + price.group(2));
 
-		return new WeaponPriceMod(key.toLowerCase(), price.group(1), price.group(2), description, url);
+		return new WeaponMod(key.toLowerCase(), price.group(1), price.group(2), description, url);
 	}
 
 	@NotNull
-	private static WeaponModifier getMasterworkBonus() {
-		return new WeaponModifier() {
+	private static WeaponBaseMod getMasterworkBonus() {
+		return new WeaponBaseMod() {
 			@Override
 			public boolean isMasterWork() {
 				return true;
@@ -173,8 +173,8 @@ public class WeaponModifiers {
 	}
 
 	@NotNull
-	private static WeaponModifier getEnchantmentBonus(int i) {
-		return new WeaponModifier() {
+	private static WeaponBaseMod getEnchantmentBonus(int i) {
+		return new WeaponBaseMod() {
 			@Override
 			public int getEnchantmentLevel() {
 				return parent.getEnchantmentLevel() + i;
