@@ -74,3 +74,11 @@
   - "combat maneuver"
   - "combat maneuvers"
   value: "bull rush, disarm, grapple, overrun, sunder, dirty trick, drag, reposition and trip"
+- keys:
+  - "dr"
+  - "damage reduction"
+  value: "https://www.d20pfsrd.com/Gamemastering/special-abilities/#TOC-Overcoming-DR"
+- keys:
+  - "hero points"
+  - "hero"
+  value: "https://www.d20pfsrd.com/gamemastering/other-rules/hero-points/"

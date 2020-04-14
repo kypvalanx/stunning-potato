@@ -2,38 +2,108 @@ package core;
 
 import behavior.Behavior;
 import behavior.GroupBehavior;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class Variables {
 
-	private Variables(){
+	private static File varFile = new File("resources/generated/vars.yaml");
 
+	private Map<String, String> variables = new HashMap<>();
+
+	private static Variables variablesO;
+
+
+	private Variables(File varFile){
+		if (varFile.canRead()) {
+			if(varFile.length() == 0){
+				return;
+			}
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+			TypeFactory typeFactory = mapper.getTypeFactory();
+
+			CollectionType mapType = typeFactory.constructCollectionType(ArrayList.class, VarPair.class);
+
+			try {
+				List<VarPair> vars =  mapper.readValue(varFile, mapType);
+				vars.forEach(varPair -> variables.put(varPair.getKey(), varPair.getValue()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				varFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	private static Map<String, String> variables = new HashMap<>();
-
-
 	public static void put(String key, String value){
-		variables.put(key, value);
+		getVariables().put(key, value);
+		variablesO.updateFile();
+	}
+
+	private static Map<String, String> getVariables() {
+		if(variablesO == null){
+			variablesO = createVariables();
+		}
+		return variablesO.variables;
+	}
+
+	@NotNull
+	private static Variables createVariables() {
+		return new Variables(varFile);
 	}
 
 	public static String get(String key){
-		return variables.get(key);
+		return getVariables().get(key);
 	}
 
 	public static boolean containsKey(String key) {
-		return variables.containsKey(key);
+		return getVariables().containsKey(key);
 	}
 
 	public static String remove(String key) {
-		return variables.remove(key);
+		String remove = getVariables().remove(key);
+		variablesO.updateFile();
+		return remove;
+	}
+
+	private void updateFile() {
+		varFile.delete();
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+		try {
+			varFile.createNewFile();
+
+			List<VarPair> vars = variables.entrySet().stream()
+					.map(stringStringEntry -> new VarPair(stringStringEntry.getKey(), stringStringEntry.getValue()))
+					.collect(Collectors.toList());
+
+			mapper.writeValue(varFile, vars);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public static Set<Map.Entry<String, String>> entrySet() {
-		return variables.entrySet();
+		return getVariables().entrySet();
 	}
 
 	public static Behavior getVarBehavior() {
@@ -70,7 +140,10 @@ public class Variables {
 						for (Map.Entry<String, String> entry : entrySet()) {
 							builder.append(entry.getKey()).append(" => ").append(entry.getValue()).append("\n");
 						}
-						event.getChannel().sendMessage(builder.toString()).queue();
+						String text = builder.toString();
+						if(text.length() > 0) {
+							event.getChannel().sendMessage(text).queue();
+						}
 					}
 				});
 	}

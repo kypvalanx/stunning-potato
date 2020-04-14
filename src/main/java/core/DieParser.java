@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 
 public class DieParser {
-	private static final List<Integer> steps = new ArrayList<>();
+	private final List<Integer> steps = new ArrayList<>();
 	private static final Random RAND = new Random();
 
 	public static DieResult rollDice(DeckList<String> dieEquation) {
@@ -17,6 +17,11 @@ public class DieParser {
 
 	public static DieResult rollDice(@NotNull String dieEquation) {
 
+		return new DieParser()._rollDice(dieEquation);
+	}
+
+	@NotNull
+	private DieResult _rollDice(@NotNull String dieEquation) {
 		if (dieEquation.startsWith("roll ")) {
 			throw new RuntimeException("getValue Die Value being called with dirty payload: " + dieEquation);
 		}
@@ -34,10 +39,10 @@ public class DieParser {
 					return getValue(value.trim(), subtract);
 				}).reduce(0, (integer, integer2) -> integer + integer2);
 
-		return new DieResult(sum, "{ " + String.join(" + ", " " + DieParser.steps).replace(" + -", " - ") + " }");
+		return new DieResult(sum, "{ " + String.join(" + ", " " + steps).replace(" + -", " - ") + " }");
 	}
 
-	private static int getValue(String value, int subtract) {
+	private int getValue(String value, int subtract) {
 		if (value.matches("\\d*d\\d+")) {
 			return parseDieExpression(value) * subtract;
 		} else if (value.matches("\\d+")) {
@@ -45,10 +50,10 @@ public class DieParser {
 			steps.add(parsed);
 			return parsed;
 		}
-		return rollDice(Variables.findVariable(value)).getSum() * subtract;
+		return _rollDice(Variables.findVariable(value)).getSum() * subtract;
 	}
 
-	private static int parseDieExpression(String value) {
+	private int parseDieExpression(String value) {
 		String[] tokens = value.split("d");
 		int times = tokens[0].isBlank()? 1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);

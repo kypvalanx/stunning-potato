@@ -28,8 +28,18 @@ public class CoreListener extends ListenerAdapter {
 		currentRebellion = Rebellion.getRebellionFromFile();
 
 		primaryContext = new GroupBehavior()
+				.setDefault(new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				String key = String.join(" ", message.getAll());
+				String value = Variables.get(key);
+				if(value != null) {
+					primaryContext.run(event, new DeckList<>(Arrays.asList(value.split(" "))));
+				}
+			}
+		})
 				.add(new String[]{"rebellion", "!r"}, getRebellionBehavior())
-				.add(new String[]{"roll"}, getRollBehavior())
+				.add(new String[]{"roll", "/roll", "!roll"}, getRollBehavior())
 				.add(new String[]{"var"}, Variables.getVarBehavior())
 				.add(new String[]{"dc"}, CheckDC.getDCBehavior())
 				.add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
@@ -155,7 +165,7 @@ public class CoreListener extends ListenerAdapter {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				DieResult dieResult = rollDice(message);
-				event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
+				event.getChannel().sendMessage(event.getAuthor().getName() + " rolls " + dieResult.getSum()).queue();
 				ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
 				CheckDC.attemptCheck(event, dieResult.getSum());
 			}
