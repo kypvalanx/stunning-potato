@@ -58,6 +58,7 @@ public class RebellionTest {
     public void testRank(){
         Rebellion rebellion = new Rebellion();
         rebellion.setSupporters(supporters);
+        rebellion.setMaxRank(20);
         assertThat(rebellion.getRebellionRank()).isEqualTo(rank);
     }
 
@@ -65,6 +66,7 @@ public class RebellionTest {
     public void testFocusCheck(){
         Rebellion rebellion = new Rebellion();
         rebellion.setSupporters(supporters);
+        rebellion.setMaxRank(20);
         assertThat(rebellion.getFocusCheckBonus()).isEqualTo(focusCheck);
     }
 
@@ -72,6 +74,7 @@ public class RebellionTest {
     public void testSecondaryCheck(){
         Rebellion rebellion = new Rebellion();
         rebellion.setSupporters(supporters);
+        rebellion.setMaxRank(20);
         assertThat(rebellion.getSecondaryCheckBonus()).isEqualTo(secondaryCheck);
     }
 
@@ -79,6 +82,7 @@ public class RebellionTest {
     public void testRebellionActions(){
         Rebellion rebellion = new Rebellion();
         rebellion.setSupporters(supporters);
+        rebellion.setMaxRank(20);
         assertThat(rebellion.getActions()).isEqualTo(rebellionActions);
     }
 
@@ -87,6 +91,7 @@ public class RebellionTest {
     public void testMaxTeams(){
         Rebellion rebellion = new Rebellion();
         rebellion.setSupporters(supporters);
+        rebellion.setMaxRank(20);
         assertThat(rebellion.getMaxTeams()).isEqualTo(maxTeams);
     }
 
