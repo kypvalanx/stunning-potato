@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,10 +21,21 @@ public class DieParser {
 		return new DieParser()._rollDice(dieEquation);
 	}
 
+	public static List<DieResult> rollDiceGroups(DeckList<String> dieEquation) {
+		return rollDiceGroups(String.join(" ", dieEquation.getDeck()));
+	}
+
+	public static List<DieResult> rollDiceGroups(@NotNull String dieEquation) {
+		String[] dieEquations = dieEquation.split("and");
+
+		return Arrays.stream(dieEquations).map(eq -> new DieParser()._rollDice(eq)).collect(Collectors.toList());
+	}
+
 	@NotNull
 	private DieResult _rollDice(@NotNull String dieEquation) {
 		if (dieEquation.startsWith("roll ")) {
-			throw new RuntimeException("getValue Die Value being called with dirty payload: " + dieEquation);
+			System.err.println("getValue Die Value being called with dirty payload: " + dieEquation);
+			dieEquation = dieEquation.substring(5);
 		}
 		String digest = dieEquation.replace("-", "+-");
 		String[] values = digest.split("\\+");
@@ -37,7 +49,7 @@ public class DieParser {
 						subtract = -1;
 					}
 					return getValue(value.trim(), subtract);
-				}).reduce(0, (integer, integer2) -> integer + integer2);
+				}).reduce(0, Integer::sum);
 
 		return new DieResult(sum, "{ " + String.join(" + ", " " + steps).replace(" + -", " - ") + " }");
 	}

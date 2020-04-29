@@ -82,3 +82,6 @@
   - "hero points"
   - "hero"
   value: "https://www.d20pfsrd.com/gamemastering/other-rules/hero-points/"
+- keys:
+  - "background skill"
+  value: "https://www.d20pfsrd.com/skills/background-skills/"

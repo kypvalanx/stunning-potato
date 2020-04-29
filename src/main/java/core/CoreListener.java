@@ -6,8 +6,10 @@ import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
 import static core.DieParser.rollDice;
+import static core.DieParser.rollDiceGroups;
 import items.ItemBehavior;
 import java.util.Arrays;
+import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +48,13 @@ public class CoreListener extends ListenerAdapter {
 				.add(new String[]{"item", "!i"}, new ItemBehavior())
 				.add(new String[]{"weapon", "!w"}, new WeaponsBehavior())
 				.add(new String[]{"pack", "!p"}, new PackBehavior())
-				.add(new String[]{"armor", "!a"}, new ArmorBehavior());
+				.add(new String[]{"armor", "!a"}, new ArmorBehavior())
+		.add(new String[]{"hey gary"}, new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				event.getChannel().sendMessage("sup fellow human").queue();
+			}
+		});
 		primaryContext
 				.add(new String[]{"help"}, new NachoHelpBehavior(primaryContext));
 		defaultContext = new GroupBehavior()
@@ -66,7 +74,7 @@ public class CoreListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-		if ("PathfinderBot".equals(event.getAuthor().getName())) {
+		if (event.getAuthor().isBot()) {
 			return;
 		}
 		try {
@@ -147,11 +155,10 @@ public class CoreListener extends ListenerAdapter {
 				DieResult dieResult;
 				if (!message.canDraw()) {
 					dieResult = rollDice("1d20+" + bonus);
-					event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
 				} else {
 					dieResult = rollDice(String.join(" ", message.getDeck()) + "+" + bonus);
-					event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
 				}
+				event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
 				event.getChannel().sendMessage(" " + dieResult.getSteps()).queue();
 				CheckDC.attemptCheck(event, dieResult.getSum());
 			}
@@ -164,10 +171,12 @@ public class CoreListener extends ListenerAdapter {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				DieResult dieResult = rollDice(message);
-				event.getChannel().sendMessage(event.getAuthor().getName() + " rolls " + dieResult.getSum()).queue();
-				ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
-				CheckDC.attemptCheck(event, dieResult.getSum());
+				List<DieResult> dieResults = rollDiceGroups(message);
+				for(DieResult dieResult : dieResults) {
+					event.getChannel().sendMessage(event.getAuthor().getAsMention() + " rolls " + dieResult.getSum()).queue();
+					ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
+					CheckDC.attemptCheck(event, dieResult.getSum());
+				}
 			}
 		};
 	}
