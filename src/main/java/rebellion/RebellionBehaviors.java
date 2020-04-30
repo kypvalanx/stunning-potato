@@ -2,8 +2,10 @@ package rebellion;
 
 import behavior.Behavior;
 import behavior.NachoHelpBehavior;
+import core.CheckDC;
 import core.DeckList;
 import static core.DieParser.rollDice;
+import core.DieResult;
 import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +36,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from supporters, accepts a die roll equation"));
 			}
 		};
@@ -51,7 +53,7 @@ public class RebellionBehaviors {
 				followUpBehavior.run(event, message);
 			}
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds to supporters, accepts a die roll equation"));
 			}
 		};
@@ -69,7 +71,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"sets supporters, accepts a die roll equation"));
 			}
 		};
@@ -88,7 +90,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts members, accepts a die roll equation"));
 			}
 		};
@@ -106,7 +108,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds members, accepts a die roll equation"));
 			}
 		};
@@ -124,7 +126,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts Notoriety, accepts a die roll equation"));
 			}
 		};
@@ -142,7 +144,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds members, accepts a die roll equation"));
 			}
 		};
@@ -160,7 +162,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts population, accepts a die roll equation"));
 			}
 		};
@@ -178,7 +180,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds population, accepts a die roll equation"));
 			}
 		};
@@ -196,7 +198,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from treasury, accepts a die roll equation"));
 			}
 		};
@@ -214,7 +216,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds to treasury, accepts a die roll equation"));
 			}
 		};
@@ -231,7 +233,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds a strategist, or removes the strategist if nothing is provided."));
 			}
 		};
@@ -248,7 +250,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Spymaster's Dex/Int stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
 			}
 		};
@@ -265,7 +267,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Sentinel stats. Accepts three bonuses [Con/Cha, Str/Wis, Dex/Int], or a 6 bonus array"));
 			}
 		};
@@ -282,7 +284,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Recruiters Character Level. Accepts a single number"));
 			}
 		};
@@ -299,7 +301,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Partisan's Str/Wis stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
 			}
 		};
@@ -316,7 +318,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Demagogue's Con/Cha stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
 			}
 		};
@@ -334,7 +336,7 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the rebellion Skill Focus: none, loyalty, secrecy, security."));
 			}
 		};
@@ -351,10 +353,69 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the maximum rank the rebellion can reach"));
 			}
 		};
 	}
 
+	public Behavior getRollLoyaltyBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				rollCheck(event, message, currentRebellion.getLoyaltyBonus());
+				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Rolls using your rebellion's loyalty bonus."));
+			}
+		};
+	}
+
+	public Behavior getRollSecrecyBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				rollCheck(event, message, currentRebellion.getSecrecyBonus());
+				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Rolls using your rebellion's secrecy bonus."));
+			}
+		};
+	}
+
+	public Behavior getRollSecurityBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message) {
+				rollCheck(event, message, currentRebellion.getSecurityBonus());
+				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Rolls using your rebellion's security bonus."));
+			}
+		};
+	}
+
+
+
+
+	private void rollCheck(MessageReceivedEvent event, DeckList<String> message, int bonus) {
+		DieResult dieResult;
+		if (!message.canDraw()) {
+			dieResult = rollDice("1d20+" + bonus);
+		} else {
+			dieResult = rollDice(String.join(" ", message.getDeck()) + "+" + bonus);
+		}
+		event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
+		event.getChannel().sendMessage(" " + dieResult.getSteps()).queue();
+		CheckDC.attemptCheck(event, dieResult.getSum());
+	}
 }

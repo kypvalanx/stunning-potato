@@ -52,6 +52,11 @@ public class CheckDC {
 							event.getChannel().sendMessage("The next die roll will be checked against DC " + peek()).queue();
 						}
 					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Check to see if any checks are pending.  The next die roll will be checked against it.";
+					}
 				})
 				.add("set", new Behavior() {
 					@Override
@@ -61,6 +66,11 @@ public class CheckDC {
 							setFailureMessage(String.join(" ", message.getDeck()));
 						}
 						event.getChannel().sendMessage("The next die roll will be checked against DC " + peek()).queue();
+					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Sets a check for the next die roll.  the first parameter is the DC, the second is a failure message.";
 					}
 				});
 	}

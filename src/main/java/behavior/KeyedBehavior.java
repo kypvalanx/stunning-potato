@@ -3,6 +3,7 @@ package behavior;
 import com.google.common.base.MoreObjects;
 import core.DeckList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -32,15 +33,13 @@ public class KeyedBehavior extends Behavior {
 
 		event.getChannel().sendMessage(value).queue();
 	}
-//
-//	@Override
-//	public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context){
-//
-//		//NOOP
-//		//event.getChannel().sendMessage(String.join(", ", getKeys) + "=>" + value).queue();
-//	}
 
-    public void setKeys(Set<String> keys) {
+	@Override
+	public List<String> getFormattedHelp(DeckList<String> s, String key) {
+		return List.of();
+	}
+
+	public void setKeys(Set<String> keys) {
         this.keys = keys;
     }
 

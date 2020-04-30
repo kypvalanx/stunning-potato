@@ -15,10 +15,20 @@ public abstract class Behavior {
 //        System.err.println("No help available for ".concat(context).concat("."));
 //    }
 
-    public List<String> getDetailedHelp(DeckList<String> s, String key)
+    public List<String> getFormattedHelp(DeckList<String> s, String key)
     {
-        System.err.println(s.getAll() + key);
-        return List.of();
+        String help = getHelp(s, key);
+        if(help == null){
+            return List.of();
+        }
+        return List.of(NachoHelpBehavior.formatHelp(key, help));
+    }
+
+    public String getHelp(DeckList<String> s, String key)
+    {
+        if(!key.isBlank())
+        {System.err.println(s.getAll() + key);}
+        return null;
     }
 
     public Behavior merge(Behavior that){

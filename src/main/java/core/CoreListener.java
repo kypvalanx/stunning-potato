@@ -5,8 +5,6 @@ import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
-import com.google.common.collect.Lists;
-import static core.DieParser.rollDice;
 import static core.DieParser.rollDiceGroups;
 import items.ItemBehavior;
 import java.util.Arrays;
@@ -57,8 +55,8 @@ public class CoreListener extends ListenerAdapter {
 			}
 
 			@Override
-			public List<String> getDetailedHelp(DeckList<String> s, String key) {
-				return Lists.newArrayList(NachoHelpBehavior.formatHelp(key, "a way to check if Gary is around."));
+			public String getHelp(DeckList<String> s, String key) {
+				return "A way to check if Gary is around.  It's nice to check in on your friends.  Maybe call once in a while.";
 			}
 		});
 		primaryContext
@@ -118,7 +116,7 @@ public class CoreListener extends ListenerAdapter {
 					}
 
 					@Override
-					public List<String> getDetailedHelp(DeckList<String> s, String key) {
+					public List<String> getFormattedHelp(DeckList<String> s, String key) {
 						return List.of(NachoHelpBehavior.formatHelp(key, "prints the rebellion sheet"));
 					}
 				})
@@ -140,31 +138,13 @@ public class CoreListener extends ListenerAdapter {
 				.add(rebellionBehaviors.getSetSentinelBehavior(), "sentinel set")
 				.add(rebellionBehaviors.getSetSpymasterBehavior(), "spymaster set")
 				.add(rebellionBehaviors.getSetStrategistBehavior(), "strategist set")
-				.add(getRollCheckBehavior(currentRebellion.getLoyaltyBonus()), "roll loyalty")
-				.add(getRollCheckBehavior(currentRebellion.getSecrecyBonus()), "roll secrecy")
-				.add(getRollCheckBehavior(currentRebellion.getSecurityBonus()), "roll security")
-				.add(RebellionEvent.getEventBehavior(currentRebellion), "event")
-				.add(RebellionEvent.getEventDoBehavior(currentRebellion), "event do", "do event");
+				.add(rebellionBehaviors.getRollLoyaltyBehavior(), "roll loyalty")
+				.add(rebellionBehaviors.getRollSecrecyBehavior(), "roll secrecy")
+				.add(rebellionBehaviors.getRollSecurityBehavior(), "roll security")
+				.add(RebellionEvent.getEventBehavior(currentRebellion), "event");
+				//.add(RebellionEvent.getEventDoBehavior(currentRebellion), "event do", "do event");
 	}
 
-
-	@NotNull
-	public Behavior getRollCheckBehavior(int bonus) {
-		return new Behavior() {
-			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				DieResult dieResult;
-				if (!message.canDraw()) {
-					dieResult = rollDice("1d20+" + bonus);
-				} else {
-					dieResult = rollDice(String.join(" ", message.getDeck()) + "+" + bonus);
-				}
-				event.getChannel().sendMessage(" " + dieResult.getSum()).queue();
-				event.getChannel().sendMessage(" " + dieResult.getSteps()).queue();
-				CheckDC.attemptCheck(event, dieResult.getSum());
-			}
-		};
-	}
 
 
 	@NotNull
@@ -178,6 +158,11 @@ public class CoreListener extends ListenerAdapter {
 					ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
 					CheckDC.attemptCheck(event, dieResult.getSum());
 				}
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "Rolls whatever is provided after it.  use the format [XdY + Z] where X is the number of dice to be rolled, Y is the number of sides, and Z is a flat bonus.  Separate all terms with a + or -.  Variables from the var command will be resolved if possible.";
 			}
 		};
 	}

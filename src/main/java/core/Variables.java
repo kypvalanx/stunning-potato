@@ -120,6 +120,11 @@ public class Variables {
 							event.getChannel().sendMessage(key + " => " + value + " saved").queue();
 						}
 					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Adds a new variable that can be run as a command or used as a payload for the roll command.";
+					}
 				})
 				.add(new String[]{"remove"}, new Behavior() {
 					@Override
@@ -131,6 +136,11 @@ public class Variables {
 						} else {
 							event.getChannel().sendMessage("variable '" + key + "' doesn't exist").queue();
 						}
+					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Removes a variable.";
 					}
 				})
 				.add(new String[]{"list"}, new Behavior() {
@@ -144,6 +154,11 @@ public class Variables {
 						if(text.length() > 0) {
 							event.getChannel().sendMessage(text).queue();
 						}
+					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Lists available variables.";
 					}
 				});
 	}

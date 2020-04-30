@@ -185,30 +185,31 @@ public class GroupBehavior extends Behavior {
         return this;
     }
 
-    public void setHelpString(String helpString) {
+    public GroupBehavior setHelpString(String helpString) {
         this.helpString = helpString;
+        return this;
     }
 
     @Override
-    public List<String> getDetailedHelp(DeckList<String> s, String key) {
+    public List<String> getFormattedHelp(DeckList<String> s, String key) {
         List<String> helpMessages = Lists.newArrayList();
         if(s.canDraw()){
             String token = s.draw();
             Behavior behavior = behaviors.get(token);
             if(behavior != null){
-                helpMessages.addAll(behavior.getDetailedHelp(s, key + " " + token));
+                helpMessages.addAll(behavior.getFormattedHelp(s, key + " " + token));
             }else{
-                helpMessages.addAll(super.getDetailedHelp(s, key));
+                helpMessages.addAll(super.getFormattedHelp(s, key));
             }
         }else {
             if(defaultBehavior != null) {
-                helpMessages.addAll(defaultBehavior.getDetailedHelp(s, key));
+                helpMessages.addAll(defaultBehavior.getFormattedHelp(s, key));
             }
             ListMultimap<Behavior, String> inverse = Multimaps.invertFrom(Multimaps.forMap(behaviors),
                     ArrayListMultimap.create());
             for(Behavior behavior : inverse.keySet()){
                 List<String> keys = inverse.get(behavior);
-                helpMessages.addAll(behavior.getDetailedHelp(s, key + " " + String.join("/", keys)));
+                helpMessages.addAll(behavior.getFormattedHelp(s, key + " " + String.join("/", keys)));
             }
         }
         return helpMessages;

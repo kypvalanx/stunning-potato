@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BehaviorHelper {
 	@NotNull
-	public static Behavior getAlphabetizedList(@NotNull final Collection<String> behaviorKeys, @NotNull final String listTitle) {
+	public static Behavior getAlphabetizedList(@NotNull final Collection<String> behaviorKeys, @NotNull final String listTitle, final String help) {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -20,6 +20,11 @@ public class BehaviorHelper {
 
 					ChannelHelper.sendLongMessage(event, "\n", keyList);
 				}
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return help;
 			}
 		};
 	}

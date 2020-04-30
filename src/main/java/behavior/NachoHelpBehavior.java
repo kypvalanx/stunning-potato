@@ -25,8 +25,13 @@ public class NachoHelpBehavior extends Behavior
 
     @Override
     public void run(MessageReceivedEvent event, DeckList<String> message) {
-        List<String> messages = groupBehavior.getDetailedHelp(message, "");
+        List<String> messages = groupBehavior.getFormattedHelp(message, "");
 
         ChannelHelper.sendLongMessage(event, "\n", String.join("\n", messages));
+    }
+
+    @Override
+    public String getHelp(DeckList<String> s, String key) {
+        return "This is a help Function, but you seem to have figured that out";
     }
 }

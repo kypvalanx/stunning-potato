@@ -33,7 +33,7 @@ public class RulesLookupBehavior extends Behavior{
 
 				List<KeyedBehavior> behaviors = mapper.readValue(file, mapType);
 
-				behavior.add(behaviors).setDefault(BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Rules:"));
+				behavior.add(behaviors).setDefault(BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Rules:", ""));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -43,5 +43,10 @@ public class RulesLookupBehavior extends Behavior{
 	@Override
 	public void run(MessageReceivedEvent event, DeckList<String> message) {
 		behavior.run(event,message);
+	}
+
+	@Override
+	public String getHelp(DeckList<String> s, String key) {
+		return "This is a rule lookup system.  Without a parameter this will list available rules, add one of those as a payload to get a lookup link.";
 	}
 }

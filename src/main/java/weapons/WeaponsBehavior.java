@@ -4,6 +4,7 @@ import behavior.Behavior;
 import behavior.BehaviorHelper;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
+import behavior.NachoHelpBehavior;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -78,12 +79,12 @@ public class WeaponsBehavior extends Behavior {
 		}
 
 		groupBehavior
-				.add("list", BehaviorHelper.getAlphabetizedList(searchIndex.values().stream().distinct().collect(Collectors.toList()), "Available Weapons"))
-				.add(new String[]{"search", "s"}, getSearchBehavior(searchIndex))
-				.add(new String[]{"category", "c"}, getSearchBehavior(category))
-				.add(new String[]{"proficiency", "p"}, getSearchBehavior(proficiency))
-				.add(new String[]{"group", "g"}, getSearchBehavior(groups))
-		.add(new String[]{"mods"},  BehaviorHelper.getAlphabetizedList(weaponModifiers.getModifiers().keySet(), "Weapon Modifications"));
+				.add("list", BehaviorHelper.getAlphabetizedList(searchIndex.values().stream().distinct().collect(Collectors.toList()), "Available Weapons", "Lists available weapons."))
+				.add(new String[]{"search", "s"}, getSearchBehavior(searchIndex, "Listing and search by weapon name."))
+				.add(new String[]{"category", "c"}, getSearchBehavior(category, "Listing and search by weapon category."))
+				.add(new String[]{"proficiency", "p"}, getSearchBehavior(proficiency, "Listing and search by weapon proficiency."))
+				.add(new String[]{"group", "g"}, getSearchBehavior(groups, "Listing and search by weapon group."))
+		.add(new String[]{"mods"},  BehaviorHelper.getAlphabetizedList(weaponModifiers.getModifiers().keySet(), "Weapon Modifications", "Lists available weapon modifications."));
 
 
 	}
@@ -136,7 +137,7 @@ public class WeaponsBehavior extends Behavior {
 		}
 	}
 
-	private Behavior getSearchBehavior(final SetValuedMap<String, String> searchIndex) {
+	private Behavior getSearchBehavior(final SetValuedMap<String, String> searchIndex, final String help) {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -151,6 +152,11 @@ public class WeaponsBehavior extends Behavior {
 
 					ChannelHelper.sendLongMessage(event, "\n", String.join("\n", searchIndex.keySet()));
 				}
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return help;
 			}
 		};
 	}
@@ -214,4 +220,11 @@ public class WeaponsBehavior extends Behavior {
 		groupBehavior.run(event, message);
 	}
 
+
+	@Override
+	public List<String> getFormattedHelp(DeckList<String> s, String key) {
+		ArrayList<String> strings = Lists.newArrayList(groupBehavior.getFormattedHelp(s, key));
+		strings.add(NachoHelpBehavior.formatHelp(key, "A lookup for weapons including modification calculations."));
+		return strings;
+	}
 }

@@ -559,6 +559,11 @@ public interface RebellionEvent {
 					event.getChannel().sendMessage(text).queue();
 				}
 			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "rolls for an event then performs the event TBD";
+			}
 		};
 	}
 
@@ -571,6 +576,11 @@ public interface RebellionEvent {
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
 				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "rolls for an event on the event table.";
 			}
 		};
 	}

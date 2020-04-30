@@ -5,6 +5,7 @@ import behavior.BehaviorHelper;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.KeyedBehavior;
+import behavior.NachoHelpBehavior;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import core.DeckList;
@@ -71,16 +72,21 @@ public class ItemBehavior extends Behavior{
 				} else {
 					String key = String.join(" ", message.getDeck());
 					List<KeyedBehavior> items2 = categoryMap.get(key);
-					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key).run(event, message);
+					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key, "").run(event, message);
 				}
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "Lists and looks up items by category.";
 			}
 		};
 
 		this.groupBehavior = new GroupBehavior()
-				.add(behaviors)
-				.add("list" , BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Items"))
+				.add("list" , BehaviorHelper.getAlphabetizedList(behaviors.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), "Available Items", "Lists available items."))
 				.add(new String[]{"categories", "c"}, categoryBehavior)
-				.add("search", getSearchBehavior());
+				.add("search", getSearchBehavior())
+				.add(behaviors);
 	}
 
 	private Behavior getSearchBehavior() {
@@ -96,6 +102,11 @@ public class ItemBehavior extends Behavior{
 
 					ChannelHelper.sendLongMessage(event,"\n",results);
 				}
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "Search for items that contain your search term.";
 			}
 		};
 	}
@@ -153,5 +164,12 @@ public class ItemBehavior extends Behavior{
 	@Override
 	public void run(MessageReceivedEvent event, DeckList<String> message) {
 		groupBehavior.run(event, message);
+	}
+
+	@Override
+	public List<String> getFormattedHelp(DeckList<String> s, String key) {
+		ArrayList<String> strings = Lists.newArrayList(groupBehavior.getFormattedHelp(s, key));
+		strings.add(NachoHelpBehavior.formatHelp(key, "A lookup for items"));
+		return strings;
 	}
 }
