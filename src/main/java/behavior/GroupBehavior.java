@@ -2,6 +2,8 @@ package behavior;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimaps;
 import core.DeckList;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class GroupBehavior extends Behavior {
     private String helpString;
@@ -27,7 +30,7 @@ public class GroupBehavior extends Behavior {
         return Objects.hash(behaviors, defaultBehavior);
     }
 
-    private Map<String, Behavior> behaviors = new HashMap<>();
+    private Map<String, GroupBehavior> behaviors = new HashMap<>();
     private Behavior defaultBehavior;
 
     public GroupBehavior(){
@@ -48,59 +51,43 @@ public class GroupBehavior extends Behavior {
     public GroupBehavior add(String path, Behavior behavior){
         return add(behavior, path);
     }
+
     public GroupBehavior add(String[] path, Behavior behavior){
         return add(behavior, path);
     }
 
     public GroupBehavior add(Behavior behavior, String... paths)
     {
-        for (String path : paths)
-        {
-            String[] tokens = path.split(" ");
-
-            if(tokens.length == 1)
-            {
-                Behavior toAdd = behavior;
-                Behavior existing = behaviors.get(path);
-                if(existing == null){
-                    behaviors.put(path.toLowerCase(), new GroupBehavior(toAdd));
-                    continue;
-                }
-                if(existing instanceof GroupBehavior){
-                    GroupBehavior existingGroupBehavior = ((GroupBehavior) existing);
-                    
-                    if(existingGroupBehavior.hasDefault()){
-                        toAdd = mergeBehaviors(toAdd, existingGroupBehavior.getDefault());
-                    }
-                    
-              //      if(!existingGroupBehavior.hasDefault()){
-                        existingGroupBehavior.setDefault(toAdd);
-                        continue;
-            //        }
-//                    Behavior existingDefault = existingGroupBehavior.getDefault();
-//                    if(!existingDefault.equals(toAdd)) {
-//
-//
-//                        System.out.println("default behavior already exists: "+ path);
-//                        System.out.println(existingDefault);
-//                        System.out.println(behavior);
-////                            throw new IllegalStateException("default behavior already exists: "+ path);
-//                    }
-                }
-                behaviors.put(path.toLowerCase(), new GroupBehavior(behavior));
-            } else {
-                String first = tokens[0];
-                Behavior existing = behaviors.get(first);
-                if(existing == null){
-                    existing = new GroupBehavior();
-                    behaviors.put(first.toLowerCase(), existing);
-                }
-                if(existing instanceof GroupBehavior){
-                    ((GroupBehavior)existing).add(new GroupBehavior(behavior), path.substring(first.length()+1));
-                }
+        if(behavior != null) {
+            for (String path : paths) {
+                addBehaviorToPath(behavior, path);
             }
         }
         return this;
+    }
+
+    private void addBehaviorToPath(@NotNull Behavior behavior, String path) {
+        String[] tokens = path.split(" ");
+
+        GroupBehavior existing = behaviors.get(tokens[0]);
+
+        if(tokens.length == 1){
+            if(existing == null){
+                if(behavior instanceof GroupBehavior) {
+                    behaviors.put(path, (GroupBehavior) behavior);
+                } else {
+                    behaviors.put(path, new GroupBehavior(behavior));
+                }
+            } else {
+                behaviors.put(path, (GroupBehavior) existing.merge(behavior));
+            }
+        } else {
+            if(existing == null){
+                existing = new GroupBehavior();
+                behaviors.put(tokens[0], existing);
+            }
+            existing.addBehaviorToPath(behavior, path.substring(tokens[0].length()+1));
+        }
     }
 
     private Behavior mergeBehaviors(Behavior one, Behavior two) {
@@ -165,24 +152,6 @@ public class GroupBehavior extends Behavior {
         return defaultBehavior != null;
     }
 
-    @Override
-    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
-        if(helpString != null){
-            event.getChannel().sendMessage(context + " " + helpString).queue();
-            return;
-        }
-
-        if(defaultBehavior != null) {
-            defaultBehavior.getHelp(event, message, context);
-        }
-
-        ArrayListMultimap<Behavior, String> keysByBehavior = Multimaps.invertFrom(Multimaps.forMap(behaviors), ArrayListMultimap.create());
-
-        for(Behavior behavior : keysByBehavior.keySet()){
-            List<String> keys = keysByBehavior.get(behavior);
-            behavior.getHelp(event, message, context.concat(" ").concat(String.join("/", keys)));
-        }
-    }
 
     @Override
     public String toString() {
@@ -200,20 +169,18 @@ public class GroupBehavior extends Behavior {
 
         if(that instanceof GroupBehavior) {
             GroupBehavior castThat = (GroupBehavior) that;
-            if (this.getDefault() == null) {
-                this.setDefault(castThat.getDefault());
+            if (getDefault() == null) {
+                setDefault(castThat.getDefault());
             } else if (castThat.getDefault() != null) {
-                this.setDefault(this.getDefault().merge(castThat.getDefault()));
+                setDefault(getDefault().merge(castThat.getDefault()));
             }
 
-            for (Map.Entry<String, Behavior> behaviorEntry : castThat.behaviors.entrySet()) {
-                Behavior behavior = behaviors.get(behaviorEntry.getKey());
-                if (behavior != null) {
-                    behaviors.put(behaviorEntry.getKey(), behavior.merge(behaviorEntry.getValue()));
-                }
+            for (Map.Entry<String, GroupBehavior> behaviorEntry : castThat.behaviors.entrySet()) {
+                GroupBehavior behavior = behaviors.get(behaviorEntry.getKey());
+                behaviors.put(behaviorEntry.getKey(), (GroupBehavior) behaviorEntry.getValue().merge(behavior));
             }
         }else if(that instanceof KeyedBehavior){
-            defaultBehavior = that.merge(defaultBehavior);
+            setDefault(that.merge(getDefault()));
         }
         return this;
     }
@@ -223,22 +190,48 @@ public class GroupBehavior extends Behavior {
     }
 
     @Override
-    public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
+    public List<String> getDetailedHelp(DeckList<String> s, String key) {
+        List<String> helpMessages = Lists.newArrayList();
         if(s.canDraw()){
             String token = s.draw();
             Behavior behavior = behaviors.get(token);
             if(behavior != null){
-                behavior.getDetailedHelp(event, s, key + " " + token);
+                helpMessages.addAll(behavior.getDetailedHelp(s, key + " " + token));
             }else{
-                super.getDetailedHelp(event, s, key);
+                helpMessages.addAll(super.getDetailedHelp(s, key));
             }
         }else {
             if(defaultBehavior != null) {
-                defaultBehavior.getDetailedHelp(event, s, key);
+                helpMessages.addAll(defaultBehavior.getDetailedHelp(s, key));
             }
-            for(Map.Entry<String, Behavior> behaviorEntry : behaviors.entrySet()){
-                behaviorEntry.getValue().getDetailedHelp(event, s, key + " " + behaviorEntry.getKey());
+            ListMultimap<Behavior, String> inverse = Multimaps.invertFrom(Multimaps.forMap(behaviors),
+                    ArrayListMultimap.create());
+            for(Behavior behavior : inverse.keySet()){
+                List<String> keys = inverse.get(behavior);
+                helpMessages.addAll(behavior.getDetailedHelp(s, key + " " + String.join("/", keys)));
             }
         }
+        return helpMessages;
     }
+
+
+//    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
+//        if(helpString != null){
+//            event.getChannel().sendMessage(context + " " + helpString).queue();
+//            return;
+//        }
+//
+//        if(defaultBehavior != null) {
+//            defaultBehavior.getDetailedHelp(event, message, context);
+//        }
+//
+//        ArrayListMultimap<Behavior, String> keysByBehavior = Multimaps.invertFrom(Multimaps.forMap(behaviors), ArrayListMultimap.create());
+//
+//        for(Behavior behavior : keysByBehavior.keySet()){
+//            List<String> keys = keysByBehavior.get(behavior);
+//            behavior.getDetailedHelp(event, message, context.concat(" ").concat(String.join("/", keys)));
+//        }
+//    }
+
+
 }

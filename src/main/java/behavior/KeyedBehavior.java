@@ -32,13 +32,13 @@ public class KeyedBehavior extends Behavior {
 
 		event.getChannel().sendMessage(value).queue();
 	}
-
-	@Override
-	public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context){
-
-		//NOOP
-		//event.getChannel().sendMessage(String.join(", ", getKeys) + "=>" + value).queue();
-	}
+//
+//	@Override
+//	public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context){
+//
+//		//NOOP
+//		//event.getChannel().sendMessage(String.join(", ", getKeys) + "=>" + value).queue();
+//	}
 
     public void setKeys(Set<String> keys) {
         this.keys = keys;

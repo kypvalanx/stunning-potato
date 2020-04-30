@@ -2,6 +2,7 @@ package behavior;
 
 
 import core.DeckList;
+import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class NachoHelpBehavior extends Behavior
 {
-
     private final GroupBehavior groupBehavior;
 
     public NachoHelpBehavior(GroupBehavior groupBehavior)
@@ -20,24 +20,13 @@ public class NachoHelpBehavior extends Behavior
 
     @NotNull
     public static String formatHelp(String key, final String message) {
-        return key + " => " + message;
+        return key + "   =>   " + message;
     }
-
 
     @Override
     public void run(MessageReceivedEvent event, DeckList<String> message) {
-        if(message.canDraw()){
-            groupBehavior.getDetailedHelp(event, message, "");
-        }else
-        {
-            groupBehavior.getHelp(event,  message, "");
-        }
+        List<String> messages = groupBehavior.getDetailedHelp(message, "");
+
+        ChannelHelper.sendLongMessage(event, "\n", String.join("\n", messages));
     }
-
-    @Override
-    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
-        //NOOP
-    }
-
-
 }

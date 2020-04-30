@@ -5,6 +5,7 @@ import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
+import com.google.common.collect.Lists;
 import static core.DieParser.rollDice;
 import static core.DieParser.rollDiceGroups;
 import items.ItemBehavior;
@@ -53,6 +54,11 @@ public class CoreListener extends ListenerAdapter {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				event.getChannel().sendMessage("sup fellow human").queue();
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return Lists.newArrayList(NachoHelpBehavior.formatHelp(key, "a way to check if Gary is around."));
 			}
 		});
 		primaryContext
@@ -112,33 +118,28 @@ public class CoreListener extends ListenerAdapter {
 					}
 
 					@Override
-					public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
-						event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key, "prints the rebellion sheet")).queue();
+					public List<String> getDetailedHelp(DeckList<String> s, String key) {
+						return List.of(NachoHelpBehavior.formatHelp(key, "prints the rebellion sheet"));
 					}
 				})
-				.add(rebellionBehaviors.getSetSupportersBehavior(), "set supporters")
-				.add(rebellionBehaviors.getAddSupportersBehavior(), "add supporters")
-				.add(rebellionBehaviors.getSubSupportersBehavior(), "subtract supporters")
-				.add(rebellionBehaviors.getSetTreasureyBehavior(), "set treasury")
-				.add(rebellionBehaviors.getAddTreasureyBehavior(), "add treasury")
-				.add(rebellionBehaviors.getSubTreasureyBehavior(), "subtract treasury")
-				.add(rebellionBehaviors.getSetPopulationBehavior(), "set population")
-				.add(rebellionBehaviors.getAddPopulationBehavior(), "add population")
-				.add(rebellionBehaviors.getSubPopulationBahavior(), "subtract population")
-				.add(rebellionBehaviors.getSetNotorietyBehavior(), "set notoriety")
-				.add(rebellionBehaviors.getAddNotorietyBehavior(), "add notoriety")
-				.add(rebellionBehaviors.getSubNotorietyBehavior(), "subtract notoriety")
-				.add(rebellionBehaviors.getSetMembersBehavior(), "set members")
-				.add(rebellionBehaviors.getAddMembersBehavior(), "add members")
-				.add(rebellionBehaviors.getSubMembersBehavior(), "subtract members")
-				.add(rebellionBehaviors.getSetMaxRankBehavior(), "set max rank", "set max level")
-				.add(rebellionBehaviors.getSetSkillFocusBehavior(), "set focus")
-				.add(rebellionBehaviors.getSetDemagogueBehavior(), "set demagogue")
-				.add(rebellionBehaviors.getSetPartisanBehavior(), "set partisan")
-				.add(rebellionBehaviors.getSetRecruiterBehavior(), "set recruiter")
-				.add(rebellionBehaviors.getSetSentinelBehavior(), "set sentinel")
-				.add(rebellionBehaviors.getSetSpymasterBehavior(), "set spymaster")
-				.add(rebellionBehaviors.getSetStrategistBahavior(), "set strategist")
+				.add(rebellionBehaviors.getAddSupportersBehavior(), "supporters add")
+				.add(rebellionBehaviors.getSubSupportersBehavior(), "supporters sub", "supporters subtract")
+				.add(rebellionBehaviors.getAddTreasuryBehavior(), "treasury add")
+				.add(rebellionBehaviors.getSubTreasuryBehavior(), "treasury sub", "treasury subtract")
+				.add(rebellionBehaviors.getAddPopulationBehavior(), "population add", "pop add")
+				.add(rebellionBehaviors.getSubPopulationBehavior(), "population sub", "population subtract", "pop sub", "pop subtract")
+				.add(rebellionBehaviors.getAddNotorietyBehavior(), "notoriety add")
+				.add(rebellionBehaviors.getSubNotorietyBehavior(), "notoriety subtract", "notoriety sub")
+				.add(rebellionBehaviors.getAddMembersBehavior(), "members add")
+				.add(rebellionBehaviors.getSubMembersBehavior(), "members sub", "members subtract")
+				.add(rebellionBehaviors.getSetMaxRankBehavior(), "max rank set", "max level set")
+				.add(rebellionBehaviors.getSetSkillFocusBehavior(), "focus set")
+				.add(rebellionBehaviors.getSetDemagogueBehavior(), "demagogue set")
+				.add(rebellionBehaviors.getSetPartisanBehavior(), "partisan set")
+				.add(rebellionBehaviors.getSetRecruiterBehavior(), "recruiter set")
+				.add(rebellionBehaviors.getSetSentinelBehavior(), "sentinel set")
+				.add(rebellionBehaviors.getSetSpymasterBehavior(), "spymaster set")
+				.add(rebellionBehaviors.getSetStrategistBehavior(), "strategist set")
 				.add(getRollCheckBehavior(currentRebellion.getLoyaltyBonus()), "roll loyalty")
 				.add(getRollCheckBehavior(currentRebellion.getSecrecyBonus()), "roll secrecy")
 				.add(getRollCheckBehavior(currentRebellion.getSecurityBonus()), "roll security")

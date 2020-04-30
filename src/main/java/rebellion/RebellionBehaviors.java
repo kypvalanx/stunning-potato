@@ -4,6 +4,7 @@ import behavior.Behavior;
 import behavior.NachoHelpBehavior;
 import core.DeckList;
 import static core.DieParser.rollDice;
+import java.util.List;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +34,8 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
-				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"subtracts from supporters, accepts a die roll equation")).queue();
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from supporters, accepts a die roll equation"));
 			}
 		};
 	}
@@ -50,8 +51,8 @@ public class RebellionBehaviors {
 				followUpBehavior.run(event, message);
 			}
 			@Override
-			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
-				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"adds to supporters, accepts a die roll equation")).queue();
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds to supporters, accepts a die roll equation"));
 			}
 		};
 	}
@@ -68,8 +69,8 @@ public class RebellionBehaviors {
 			}
 
 			@Override
-			public void getDetailedHelp(MessageReceivedEvent event, DeckList<String> s, String key) {
-				event.getChannel().sendMessage(NachoHelpBehavior.formatHelp(key,"sets supporters, accepts a die roll equation")).queue();
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"sets supporters, accepts a die roll equation"));
 			}
 		};
 	}
@@ -85,6 +86,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts members, accepts a die roll equation"));
+			}
 		};
 	}
 
@@ -98,18 +104,10 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(event, message);
 			}
-		};
-	}
 
-	@NotNull
-	public Behavior getSetMembersBehavior() {
-		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				currentRebellion.setMembers(rollDice(message).getSum());
-
-				event.getChannel().sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(event, message);
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds members, accepts a die roll equation"));
 			}
 		};
 	}
@@ -124,6 +122,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts Notoriety, accepts a die roll equation"));
+			}
 		};
 	}
 
@@ -137,24 +140,16 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(event, message);
 			}
-		};
-	}
 
-	@NotNull
-	public Behavior getSetNotorietyBehavior() {
-		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				currentRebellion.setNotoriety(rollDice(message).getSum());
-
-				event.getChannel().sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(event, message);
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds members, accepts a die roll equation"));
 			}
 		};
 	}
 
 	@NotNull
-	public Behavior getSubPopulationBahavior() {
+	public Behavior getSubPopulationBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -162,6 +157,11 @@ public class RebellionBehaviors {
 
 				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
 				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts population, accepts a die roll equation"));
 			}
 		};
 	}
@@ -176,24 +176,16 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
 				followUpBehavior.run(event, message);
 			}
-		};
-	}
 
-	@NotNull
-	public Behavior getSetPopulationBehavior() {
-		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				currentRebellion.setPopulation(rollDice(message).getSum());
-
-				event.getChannel().sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
-				followUpBehavior.run(event, message);
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds population, accepts a die roll equation"));
 			}
 		};
 	}
 
 	@NotNull
-	public Behavior getSubTreasureyBehavior() {
+	public Behavior getSubTreasuryBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -202,11 +194,16 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from treasury, accepts a die roll equation"));
+			}
 		};
 	}
 
 	@NotNull
-	public Behavior getAddTreasureyBehavior() {
+	public Behavior getAddTreasuryBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
@@ -215,31 +212,27 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
 				followUpBehavior.run(event, message);
 			}
-		};
-	}
 
-	@NotNull
-	public Behavior getSetTreasureyBehavior() {
-		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				currentRebellion.setTreasury(rollDice(message).getSum());
-
-				event.getChannel().sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
-				followUpBehavior.run(event, message);
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds to treasury, accepts a die roll equation"));
 			}
 		};
 	}
 
-
 	@NotNull
-	public Behavior getSetStrategistBahavior() {
+	public Behavior getSetStrategistBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message) {
 				currentRebellion.setStrategist(message.getDeck());
 				event.getChannel().sendMessage("Strategist Available: " + currentRebellion.isHasStrategist()).queue();
 				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"adds a strategist, or removes the strategist if nothing is provided."));
 			}
 		};
 	}
@@ -253,6 +246,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterDexOrIntBonus()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Spymaster's Dex/Int stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
+			}
 		};
 	}
 
@@ -264,6 +262,11 @@ public class RebellionBehaviors {
 				currentRebellion.setSentinal(message.getDeck());
 				event.getChannel().sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelConOrChaBonus() + ", " + currentRebellion.getSentinelStrOrWisBonus() + ", " + currentRebellion.getSentinelDexOrIntBonus()).queue();
 				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Sentinel stats. Accepts three bonuses [Con/Cha, Str/Wis, Dex/Int], or a 6 bonus array"));
 			}
 		};
 	}
@@ -277,6 +280,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Recruiter Level Set: " + currentRebellion.getRecruiterLvlBonus()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Recruiters Character Level. Accepts a single number"));
+			}
 		};
 	}
 
@@ -289,6 +297,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanStrOrWisBonus()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Partisan's Str/Wis stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
+			}
 		};
 	}
 
@@ -300,6 +313,11 @@ public class RebellionBehaviors {
 				currentRebellion.setDemagogue(message.getDeck());
 				event.getChannel().sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueConOrChaBonus()).queue();
 				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the Demagogue's Con/Cha stat, accepts the bonus you want active, both appropriate bonuses, or a 6 bonus array"));
 			}
 		};
 	}
@@ -314,6 +332,11 @@ public class RebellionBehaviors {
 				event.getChannel().sendMessage("Focus Set: " + currentRebellion.getFocus()).queue();
 				followUpBehavior.run(event, message);
 			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the rebellion Skill Focus: none, loyalty, secrecy, security."));
+			}
 		};
 	}
 
@@ -325,6 +348,11 @@ public class RebellionBehaviors {
 				currentRebellion.setMaxRank(rollDice(message).getSum());
 				event.getChannel().sendMessage("Max Level Set: " + currentRebellion.getRebellionMaxLevel()).queue();
 				followUpBehavior.run(event, message);
+			}
+
+			@Override
+			public List<String> getDetailedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"Sets the maximum rank the rebellion can reach"));
 			}
 		};
 	}
