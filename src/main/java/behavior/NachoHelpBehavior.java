@@ -3,6 +3,7 @@ package behavior;
 
 import core.DeckList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,10 +25,10 @@ public class NachoHelpBehavior extends Behavior
     }
 
     @Override
-    public void run(MessageReceivedEvent event, DeckList<String> message) {
+    public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
         List<String> messages = groupBehavior.getFormattedHelp(message, "");
 
-        ChannelHelper.sendLongMessage(event, "\n", String.join("\n", messages));
+        ChannelHelper.sendLongMessage("\n", String.join("\n", messages), channel);
     }
 
     @Override

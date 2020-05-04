@@ -26,7 +26,7 @@ public class DieParser {
 	}
 
 	public static List<DieResult> rollDiceGroups(@NotNull String dieEquation) {
-		String[] dieEquations = dieEquation.split("and");
+		String[] dieEquations = dieEquation.split(" and ");
 
 		return Arrays.stream(dieEquations).map(eq -> new DieParser()._rollDice(eq)).collect(Collectors.toList());
 	}
@@ -37,6 +37,11 @@ public class DieParser {
 			System.err.println("getValue Die Value being called with dirty payload: " + dieEquation);
 			dieEquation = dieEquation.substring(5);
 		}
+		dieEquation = dieEquation.trim();
+		if(dieEquation.startsWith("'") || dieEquation.startsWith("`")){
+			return new DieResult(dieEquation.substring(1));
+		}
+
 		String digest = dieEquation.replace("-", "+-");
 		String[] values = digest.split("\\+");
 
@@ -57,12 +62,34 @@ public class DieParser {
 	private int getValue(String value, int subtract) {
 		if (value.matches("\\d*d\\d+")) {
 			return parseDieExpression(value) * subtract;
+		} else if (value.matches("\\d*e\\d+")) {
+			return parseExplodingDieExpression(value) * subtract;
 		} else if (value.matches("\\d+")) {
 			int parsed = Integer.parseInt(value) * subtract;
 			steps.add(parsed);
 			return parsed;
 		}
 		return _rollDice(Variables.findVariable(value)).getSum() * subtract;
+	}
+
+	private int parseExplodingDieExpression(String value) {
+		String[] tokens = value.split("e");
+		int times = tokens[0].isBlank()? -1 : Integer.parseInt(tokens[0]);
+		int size = Integer.parseInt(tokens[1]);
+		int total = 0;
+		while (times != 0){
+			int roll = RAND.nextInt(size) + 1;
+			steps.add(roll);
+			total += roll;
+
+			if(roll != size){
+				break;
+			}else {
+				times--;
+			}
+		}
+
+		return total;
 	}
 
 	private int parseDieExpression(String value) {
@@ -74,6 +101,6 @@ public class DieParser {
 					steps.add(roll);
 					return roll;
 				}
-		).reduce(0, (left, right) -> left + right);
+		).reduce(0, Integer::sum);
 	}
 }

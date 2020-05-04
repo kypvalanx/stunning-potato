@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -112,11 +113,11 @@ public class GroupBehavior extends Behavior {
     }
 
     @Override
-    public void run(MessageReceivedEvent event, DeckList<String> message)
+    public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel)
     {
         if(!message.canDraw()){
             if(defaultBehavior != null) {
-                defaultBehavior.run(event, message);
+                defaultBehavior.run(event, message, channel);
             }
             return;
         }
@@ -126,7 +127,7 @@ public class GroupBehavior extends Behavior {
         if (token == null)
         {
             if(defaultBehavior != null) {
-                defaultBehavior.run(event, message);
+                defaultBehavior.run(event, message, channel);
             }
             return;
         }
@@ -136,10 +137,10 @@ public class GroupBehavior extends Behavior {
         if (behavior != null)
         {
             message.draw();
-            behavior.run(event, message);
+            behavior.run(event, message, channel);
         } else if (defaultBehavior != null)
         {
-            defaultBehavior.run(event, message);
+            defaultBehavior.run(event, message, channel);
         }
     }
 
@@ -218,7 +219,7 @@ public class GroupBehavior extends Behavior {
 
 //    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context) {
 //        if(helpString != null){
-//            event.getChannel().sendMessage(context + " " + helpString).queue();
+//            channel.sendMessage(context + " " + helpString).queue();
 //            return;
 //        }
 //

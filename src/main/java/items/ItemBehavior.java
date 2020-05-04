@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
@@ -62,17 +63,17 @@ public class ItemBehavior extends Behavior{
 
 		Behavior categoryBehavior = new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				if (!message.canDraw()) {
 					List<String> categoryTitles = Lists.newArrayList(categoryMap.keys().elementSet());
-					event.getChannel().sendMessage("Categories:").queue();
+					channel.sendMessage("Categories:").queue();
 					for (int i = 0; i < categoryTitles.size(); i += 100) {
-						event.getChannel().sendMessage(String.join("\n", categoryTitles.subList(i, Math.min(i + 100, categoryTitles.size())))).queue();
+						channel.sendMessage(String.join("\n", categoryTitles.subList(i, Math.min(i + 100, categoryTitles.size())))).queue();
 					}
 				} else {
 					String key = String.join(" ", message.getDeck());
 					List<KeyedBehavior> items2 = categoryMap.get(key);
-					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key, "").run(event, message);
+					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key, "").run(event, message, channel);
 				}
 			}
 
@@ -92,7 +93,7 @@ public class ItemBehavior extends Behavior{
 	private Behavior getSearchBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				if(message.canDraw()){
 					String searchTerm = String.join(" ", message.getDeck());
 
@@ -100,7 +101,7 @@ public class ItemBehavior extends Behavior{
 							.filter(entry -> entry.getKey().contains(searchTerm))
 							.map(Map.Entry::getValue).distinct().sorted().collect(Collectors.joining("\n"));
 
-					ChannelHelper.sendLongMessage(event,"\n",results);
+					ChannelHelper.sendLongMessage("\n",results, channel);
 				}
 			}
 
@@ -162,8 +163,8 @@ public class ItemBehavior extends Behavior{
 
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message) {
-		groupBehavior.run(event, message);
+	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+		groupBehavior.run(event, message, channel);
 	}
 
 	@Override

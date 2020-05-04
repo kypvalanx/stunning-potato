@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -110,14 +111,14 @@ public class Variables {
 		return new GroupBehavior()
 				.add(new String[]{"add"}, new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						String key = message.draw();
 						String value = String.join(" ", message.getDeck());
 						if (value.isBlank()) {
-							event.getChannel().sendMessage("variable " + key + " requires value").queue();
+							channel.sendMessage("variable " + key + " requires value").queue();
 						} else {
 							put(key, value);
-							event.getChannel().sendMessage(key + " => " + value + " saved").queue();
+							channel.sendMessage(key + " => " + value + " saved").queue();
 						}
 					}
 
@@ -128,13 +129,13 @@ public class Variables {
 				})
 				.add(new String[]{"remove"}, new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						String key = message.draw();
 						if (containsKey(key)) {
 							remove(key);
-							event.getChannel().sendMessage("variable '" + key + "' removed").queue();
+							channel.sendMessage("variable '" + key + "' removed").queue();
 						} else {
-							event.getChannel().sendMessage("variable '" + key + "' doesn't exist").queue();
+							channel.sendMessage("variable '" + key + "' doesn't exist").queue();
 						}
 					}
 
@@ -145,14 +146,14 @@ public class Variables {
 				})
 				.add(new String[]{"list"}, new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						StringBuilder builder = new StringBuilder();
 						for (Map.Entry<String, String> entry : entrySet()) {
 							builder.append(entry.getKey()).append(" => ").append(entry.getValue()).append("\n");
 						}
 						String text = builder.toString();
 						if(text.length() > 0) {
-							event.getChannel().sendMessage(text).queue();
+							channel.sendMessage(text).queue();
 						}
 					}
 

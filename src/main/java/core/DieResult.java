@@ -3,15 +3,20 @@ package core;
 import com.google.common.base.MoreObjects;
 
 public class DieResult {
-	private final String steps;
-	private final int sum;
+	private String message;
+	private String steps;
+	private int sum;
 
 	public DieResult(int sum, String steps) {
 		this.sum = sum;
 		this.steps = steps;
 	}
 
-	public String getSteps() {
+	public DieResult(String message) {
+		this.message = message;
+	}
+
+    public String getSteps() {
 		return steps;
 	}
 
@@ -19,11 +24,16 @@ public class DieResult {
 		return sum;
 	}
 
+	public String getMessage() {
+		return message;
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("steps", steps)
 				.add("sum", sum)
+				.add("message", message)
 				.toString();
 	}
 }

@@ -2,13 +2,14 @@ package behavior;
 
 import core.DeckList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public abstract class Behavior {
 
     private GroupBehavior parent;
 
-    public abstract void run(MessageReceivedEvent event, DeckList<String> message);
+    public abstract void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel);
 
 //    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context)
 //    {

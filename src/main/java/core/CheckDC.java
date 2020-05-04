@@ -2,6 +2,7 @@ package core;
 
 import behavior.Behavior;
 import behavior.GroupBehavior;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CheckDC {
@@ -45,11 +46,11 @@ public class CheckDC {
 		return new GroupBehavior()
 				.setDefault(new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						if (!hasDC()) {
-							event.getChannel().sendMessage("No current set DC.").queue();
+							channel.sendMessage("No current set DC.").queue();
 						} else {
-							event.getChannel().sendMessage("The next die roll will be checked against DC " + peek()).queue();
+							channel.sendMessage("The next die roll will be checked against DC " + peek()).queue();
 						}
 					}
 
@@ -60,12 +61,12 @@ public class CheckDC {
 				})
 				.add("set", new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						setDC(Integer.parseInt(message.draw()));
 						if (message.canDraw()) {
 							setFailureMessage(String.join(" ", message.getDeck()));
 						}
-						event.getChannel().sendMessage("The next die roll will be checked against DC " + peek()).queue();
+						channel.sendMessage("The next die roll will be checked against DC " + peek()).queue();
 					}
 
 					@Override
@@ -75,12 +76,12 @@ public class CheckDC {
 				});
 	}
 
-	public static void attemptCheck(MessageReceivedEvent event, int roll) {
+	public static void attemptCheck(int roll, MessageChannel channel) {
 		if (hasDC()) {
 			if (roll < getDC()) {
-				event.getChannel().sendMessage("Check Failed! " + getFailureMessage()).queue();
+				channel.sendMessage("Check Failed! " + getFailureMessage()).queue();
 			} else {
-				event.getChannel().sendMessage("Check Passed!").queue();
+				channel.sendMessage("Check Passed!").queue();
 			}
 		}
 	}

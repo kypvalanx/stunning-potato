@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class KeyedBehavior extends Behavior {
@@ -29,9 +30,9 @@ public class KeyedBehavior extends Behavior {
 
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message) {
+	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 
-		event.getChannel().sendMessage(value).queue();
+		channel.sendMessage(value).queue();
 	}
 
 	@Override

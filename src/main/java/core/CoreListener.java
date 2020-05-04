@@ -5,10 +5,15 @@ import behavior.Behavior;
 import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
+import com.google.common.collect.Lists;
+import static core.DieParser.rollDice;
 import static core.DieParser.rollDiceGroups;
 import items.ItemBehavior;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +25,7 @@ import rules.RulesLookupBehavior;
 import weapons.WeaponsBehavior;
 
 public class CoreListener extends ListenerAdapter {
+	private static final File GYGAX_GREETING = new File("resources/images/gygax1.jpg");
 	private final GroupBehavior primaryContext;
 	private final GroupBehavior defaultContext;
 	private Rebellion currentRebellion;
@@ -31,11 +37,11 @@ public class CoreListener extends ListenerAdapter {
 		primaryContext = new GroupBehavior()
 				.setDefault(new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				String key = String.join(" ", message.getAll());
 				String value = Variables.get(key);
 				if(value != null) {
-					primaryContext.run(event, new DeckList<>(Arrays.asList(value.split(" "))));
+					primaryContext.run(event, new DeckList<>(Arrays.asList(value.split(" "))), channel);
 				}
 			}
 		})
@@ -50,8 +56,11 @@ public class CoreListener extends ListenerAdapter {
 				.add(new String[]{"armor", "!a"}, new ArmorBehavior())
 		.add(new String[]{"hey gary"}, new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
-				event.getChannel().sendMessage("sup fellow human").queue();
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+				DieResult dieResult = rollDice("d20");
+				String saying = dieResult.getSum()>9 ? "pleased to meet you." : "so terribly, terribly disappointed in you";
+				channel.sendFile(GYGAX_GREETING, ".pleased_to_meet_you.jpg").queue();
+				channel.sendMessage("I am ... \n @GaryBot rolls "+dieResult.getSum()+"\n"+dieResult.getSteps()+"\n ... "+saying).queue();
 			}
 
 			@Override
@@ -59,6 +68,8 @@ public class CoreListener extends ListenerAdapter {
 				return "A way to check if Gary is around.  It's nice to check in on your friends.  Maybe call once in a while.";
 			}
 		});
+
+
 		primaryContext
 				.add(new String[]{"help"}, new NachoHelpBehavior(primaryContext));
 		defaultContext = new GroupBehavior()
@@ -69,7 +80,7 @@ public class CoreListener extends ListenerAdapter {
 	private Behavior getExitContextBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				currentContext = Context.DEFAULT;
 			}
 		};
@@ -81,17 +92,25 @@ public class CoreListener extends ListenerAdapter {
 		if (event.getAuthor().isBot()) {
 			return;
 		}
+		MessageChannel channel = event.getChannel();
 		try {
 			final String key = event.getMessage().getContentRaw().toLowerCase().trim();
 
 			DeckList<String> message = new DeckList<>(Arrays.asList(key.split(" ")));
 
-			if (currentContext == Context.DEFAULT) {
-				primaryContext.run(event, message);
+			if(event.getMessage().isMentioned(event.getJDA().getSelfUser(), Message.MentionType.USER)){
+				channel = event.getAuthor().openPrivateChannel().complete();
+
+				if(message.canDraw()){
+				message.draw();}
 			}
-			defaultContext.run(event, message);
+
+			if (currentContext == Context.DEFAULT) {
+				primaryContext.run(event, message, channel);
+			}
+			defaultContext.run(event, message, channel);
 		} catch (Exception e) {
-			event.getChannel().sendMessage(">>>>>>>>>>>>>>ERROR\n" + e.getMessage()).queue();
+			channel.sendMessage(">>>>>>>>>>>>>>ERROR\n" + e.getMessage()).queue();
 			throw e;
 		}
 	}
@@ -99,7 +118,7 @@ public class CoreListener extends ListenerAdapter {
 	private GroupBehavior getRebellionBehavior() {
 		Behavior updateRebellion = new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				Rebellion.writeOutRebellionToFile(currentRebellion);
 			}
 		};
@@ -109,9 +128,9 @@ public class CoreListener extends ListenerAdapter {
 		return new GroupBehavior()
 				.setDefault(new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message) {
+					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 						if (!message.canDraw()) {
-							event.getChannel().sendMessage(currentRebellion.getSheet()).queue();
+							channel.sendMessage(currentRebellion.getSheet()).queue();
 						}
 					}
 
@@ -151,18 +170,24 @@ public class CoreListener extends ListenerAdapter {
 	private Behavior getRollBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				List<DieResult> dieResults = rollDiceGroups(message);
+				List<String> messages = Lists.newArrayList();
 				for(DieResult dieResult : dieResults) {
-					event.getChannel().sendMessage(event.getAuthor().getAsMention() + " rolls " + dieResult.getSum()).queue();
-					ChannelHelper.sendLongMessage(event, " ", dieResult.getSteps());
-					CheckDC.attemptCheck(event, dieResult.getSum());
+					if(dieResult.getMessage() != null){
+						messages.add(dieResult.getMessage());
+					} else {
+						messages.add(event.getAuthor().getAsMention() + " rolls " + dieResult.getSum());
+						messages.add(dieResult.getSteps());
+						CheckDC.attemptCheck(dieResult.getSum(), channel);
+					}
 				}
+				ChannelHelper.sendLongMessage(" ", String.join("\n",messages), channel);
 			}
 
 			@Override
 			public String getHelp(DeckList<String> s, String key) {
-				return "Rolls whatever is provided after it.  use the format [XdY + Z] where X is the number of dice to be rolled, Y is the number of sides, and Z is a flat bonus.  Separate all terms with a + or -.  Variables from the var command will be resolved if possible.";
+				return "Rolls whatever is provided after it.  use the format [XdY + Z] where X is the number of dice to be rolled, Y is the number of sides, and Z is a flat bonus.  Separate all terms with a + or -.  Variables from the var command will be resolved if possible. Separate rolls can be separated with and.  die eqs precided by an ' will be printed back without resolving.";
 			}
 		};
 	}

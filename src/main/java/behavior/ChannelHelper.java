@@ -1,9 +1,9 @@
 package behavior;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class ChannelHelper {
-	public static void sendLongMessage(MessageReceivedEvent event, String delimiter, String steps) {
+	public static void sendLongMessage(String delimiter, String steps, MessageChannel channel) {
 		if(steps == null || steps.isEmpty()){
 			return;
 		}
@@ -14,12 +14,12 @@ public class ChannelHelper {
 			if(tok.length() + message.length() + delimiter.length() < 2000){
 				message = message.concat(delimiter+tok);
 			}else{
-				event.getChannel().sendMessage(message).queue();
+				channel.sendMessage(message).queue();
 				message = tok;
 			}
 		}
         if(message.length() > 0) {
-			event.getChannel().sendMessage(message).queue();
+			channel.sendMessage(message).queue();
 		}
 	}
 }

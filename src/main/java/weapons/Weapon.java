@@ -5,6 +5,7 @@ import behavior.ChannelHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.DeckList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import weapons.modifiers.WeaponModifiers;
 
@@ -25,7 +26,7 @@ public interface Weapon {
 	default Behavior getWeaponStatBlockBehavior(){
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				String statBlock =
 						getName() + "\n" +
 								"Cost: " + getCost() + " gp Weight: " + getWeight() + " lbs\n" +
@@ -34,7 +35,7 @@ public interface Weapon {
 								"Weapon Groups: " + String.join(", ", getWeaponGroups()) + "\nDescription:\n"
 								+ getDescription();
 
-				ChannelHelper.sendLongMessage(event, " ", statBlock);
+				ChannelHelper.sendLongMessage(" ", statBlock, channel);
 			}
 		};
 	}

@@ -3,6 +3,7 @@ package rebellion.events;
 import behavior.Behavior;
 import core.DeckList;
 import static core.DieParser.rollDice;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import rebellion.Rebellion;
@@ -549,14 +550,14 @@ public interface RebellionEvent {
 	public static Behavior getEventDoBehavior(Rebellion rebellion) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
-				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
-				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
+				channel.sendMessage("{" + eventNumber + "}").queue();
+				channel.sendMessage(rebellionEvent.getDescription()).queue();
 				String text = rebellionEvent.doEvent();
 				if (!text.isBlank()) {
-					event.getChannel().sendMessage(text).queue();
+					channel.sendMessage(text).queue();
 				}
 			}
 
@@ -571,11 +572,11 @@ public interface RebellionEvent {
 	static Behavior getEventBehavior(Rebellion rebellion) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message) {
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
 				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
-				event.getChannel().sendMessage("{" + eventNumber + "}").queue();
-				event.getChannel().sendMessage(rebellionEvent.getDescription()).queue();
+				channel.sendMessage("{" + eventNumber + "}").queue();
+				channel.sendMessage(rebellionEvent.getDescription()).queue();
 			}
 
 			@Override
