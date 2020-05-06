@@ -25,6 +25,26 @@ public class RebellionBehaviors {
 	}
 
 
+
+	public Behavior getSupportersBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+				if(message.canDraw()){
+					currentRebellion.addSupporters(rollDice(message).getSum());
+				}
+
+				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
+				followUpBehavior.run(event, message, channel);
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"reports the current supporters or adds the payload"));
+			}
+		};
+	}
+
 	@NotNull
 	public Behavior getSubSupportersBehavior() {
 		return new Behavior() {
@@ -183,6 +203,25 @@ public class RebellionBehaviors {
 			@Override
 			public List<String> getFormattedHelp(DeckList<String> s, String key) {
 				return List.of(NachoHelpBehavior.formatHelp(key,"adds population, accepts a die roll equation"));
+			}
+		};
+	}
+
+	public Behavior getTreasuryBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+				if(message.canDraw()){
+					currentRebellion.addTreasury(rollDice(message).getSum());
+				}
+
+				channel.sendMessage("Treasury " + currentRebellion.getTreasury()).queue();
+				followUpBehavior.run(event, message, channel);
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key,"reports the treasury or adds a supplied payload"));
 			}
 		};
 	}

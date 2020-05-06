@@ -29,7 +29,7 @@ public class CoreListener extends ListenerAdapter {
 	private final GroupBehavior primaryContext;
 	private final GroupBehavior defaultContext;
 	private Rebellion currentRebellion;
-	private Context currentContext = Context.DEFAULT;
+	private ListenerContext currentListenerContext = ListenerContext.DEFAULT;
 
 	public CoreListener() {
 		currentRebellion = Rebellion.getRebellionFromFile();
@@ -81,7 +81,7 @@ public class CoreListener extends ListenerAdapter {
 		return new Behavior() {
 			@Override
 			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
-				currentContext = Context.DEFAULT;
+				currentListenerContext = ListenerContext.DEFAULT;
 			}
 		};
 	}
@@ -92,6 +92,7 @@ public class CoreListener extends ListenerAdapter {
 		if (event.getAuthor().isBot()) {
 			return;
 		}
+		Context.setCaller(event.getAuthor());
 		MessageChannel channel = event.getChannel();
 		try {
 			final String key = event.getMessage().getContentRaw().toLowerCase().trim();
@@ -105,7 +106,7 @@ public class CoreListener extends ListenerAdapter {
 				message.draw();}
 			}
 
-			if (currentContext == Context.DEFAULT) {
+			if (currentListenerContext == ListenerContext.DEFAULT) {
 				primaryContext.run(event, message, channel);
 			}
 			defaultContext.run(event, message, channel);
@@ -139,10 +140,12 @@ public class CoreListener extends ListenerAdapter {
 						return List.of(NachoHelpBehavior.formatHelp(key, "prints the rebellion sheet"));
 					}
 				})
-				.add(rebellionBehaviors.getAddSupportersBehavior(), "supporters add")
-				.add(rebellionBehaviors.getSubSupportersBehavior(), "supporters sub", "supporters subtract")
-				.add(rebellionBehaviors.getAddTreasuryBehavior(), "treasury add")
-				.add(rebellionBehaviors.getSubTreasuryBehavior(), "treasury sub", "treasury subtract")
+				.add(rebellionBehaviors.getSupportersBehavior(), "supporters")
+				//.add(rebellionBehaviors.getAddSupportersBehavior(), "supporters add")
+				//.add(rebellionBehaviors.getSubSupportersBehavior(), "supporters sub", "supporters subtract")
+				.add(rebellionBehaviors.getTreasuryBehavior(), "treasury")
+				//.add(rebellionBehaviors.getAddTreasuryBehavior(), "treasury add")
+				//.add(rebellionBehaviors.getSubTreasuryBehavior(), "treasury sub", "treasury subtract")
 				.add(rebellionBehaviors.getAddPopulationBehavior(), "population add", "pop add")
 				.add(rebellionBehaviors.getSubPopulationBehavior(), "population sub", "population subtract", "pop sub", "pop subtract")
 				.add(rebellionBehaviors.getAddNotorietyBehavior(), "notoriety add")
@@ -150,16 +153,16 @@ public class CoreListener extends ListenerAdapter {
 				.add(rebellionBehaviors.getAddMembersBehavior(), "members add")
 				.add(rebellionBehaviors.getSubMembersBehavior(), "members sub", "members subtract")
 				.add(rebellionBehaviors.getSetMaxRankBehavior(), "max rank set", "max level set")
-				.add(rebellionBehaviors.getSetSkillFocusBehavior(), "focus set")
-				.add(rebellionBehaviors.getSetDemagogueBehavior(), "demagogue set")
-				.add(rebellionBehaviors.getSetPartisanBehavior(), "partisan set")
-				.add(rebellionBehaviors.getSetRecruiterBehavior(), "recruiter set")
-				.add(rebellionBehaviors.getSetSentinelBehavior(), "sentinel set")
-				.add(rebellionBehaviors.getSetSpymasterBehavior(), "spymaster set")
-				.add(rebellionBehaviors.getSetStrategistBehavior(), "strategist set")
-				.add(rebellionBehaviors.getRollLoyaltyBehavior(), "roll loyalty")
-				.add(rebellionBehaviors.getRollSecrecyBehavior(), "roll secrecy")
-				.add(rebellionBehaviors.getRollSecurityBehavior(), "roll security")
+				.add(rebellionBehaviors.getSetSkillFocusBehavior(), "focus")
+				.add(rebellionBehaviors.getSetDemagogueBehavior(), "demagogue")
+				.add(rebellionBehaviors.getSetPartisanBehavior(), "partisan")
+				.add(rebellionBehaviors.getSetRecruiterBehavior(), "recruiter")
+				.add(rebellionBehaviors.getSetSentinelBehavior(), "sentinel")
+				.add(rebellionBehaviors.getSetSpymasterBehavior(), "spymaster")
+				.add(rebellionBehaviors.getSetStrategistBehavior(), "strategist")
+				.add(rebellionBehaviors.getRollLoyaltyBehavior(), "roll loyalty", "loyalty")
+				.add(rebellionBehaviors.getRollSecrecyBehavior(), "roll secrecy", "secrecy")
+				.add(rebellionBehaviors.getRollSecurityBehavior(), "roll security", "security")
 				.add(RebellionEvent.getEventBehavior(currentRebellion), "event");
 				//.add(RebellionEvent.getEventDoBehavior(currentRebellion), "event do", "do event");
 	}
@@ -177,7 +180,7 @@ public class CoreListener extends ListenerAdapter {
 					if(dieResult.getMessage() != null){
 						messages.add(dieResult.getMessage());
 					} else {
-						messages.add(event.getAuthor().getAsMention() + " rolls " + dieResult.getSum());
+						messages.add(Context.getCaller().getAsMention() + " rolls " + dieResult.getSum());
 						messages.add(dieResult.getSteps());
 						CheckDC.attemptCheck(dieResult.getSum(), channel);
 					}

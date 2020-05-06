@@ -3,6 +3,7 @@ package core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -46,6 +47,8 @@ public class DieParser {
 		String[] values = digest.split("\\+");
 
 		int sum = Arrays.stream(values)
+				.filter(Objects::nonNull)
+				.filter(s -> !s.isBlank())
 				.map(String::trim)
 				.map(value -> {
 					int subtract = 1;
@@ -76,6 +79,9 @@ public class DieParser {
 		String[] tokens = value.split("e");
 		int times = tokens[0].isBlank()? -1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);
+		if(size == 1){
+			return -1;
+		}
 		int total = 0;
 		while (times != 0){
 			int roll = RAND.nextInt(size) + 1;
@@ -96,7 +102,7 @@ public class DieParser {
 		String[] tokens = value.split("d");
 		int times = tokens[0].isBlank()? 1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);
-		return IntStream.range(0, times).parallel().map(i -> {
+		return IntStream.range(0, times).map(i -> {
 					int roll = RAND.nextInt(size) + 1;
 					steps.add(roll);
 					return roll;
