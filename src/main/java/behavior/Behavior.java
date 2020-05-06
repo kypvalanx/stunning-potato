@@ -9,7 +9,7 @@ public abstract class Behavior {
 
     private GroupBehavior parent;
 
-    public abstract void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel);
+    public abstract void run(DeckList<String> message, MessageChannel channel);
 
 //    public void getHelp(MessageReceivedEvent event, DeckList<String> message, String context)
 //    {

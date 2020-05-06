@@ -46,7 +46,7 @@ public class CheckDC {
 		return new GroupBehavior()
 				.setDefault(new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+					public void run(DeckList<String> message, MessageChannel channel) {
 						if (!hasDC()) {
 							channel.sendMessage("No current set DC.").queue();
 						} else {
@@ -61,7 +61,7 @@ public class CheckDC {
 				})
 				.add("set", new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+					public void run(DeckList<String> message, MessageChannel channel) {
 						setDC(Integer.parseInt(message.draw()));
 						if (message.canDraw()) {
 							setFailureMessage(String.join(" ", message.getDeck()));

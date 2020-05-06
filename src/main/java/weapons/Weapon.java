@@ -26,7 +26,7 @@ public interface Weapon {
 	default Behavior getWeaponStatBlockBehavior(){
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				String statBlock =
 						getName() + "\n" +
 								"Cost: " + getCost() + " gp Weight: " + getWeight() + " lbs\n" +

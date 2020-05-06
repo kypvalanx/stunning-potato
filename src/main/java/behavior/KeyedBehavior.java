@@ -30,7 +30,7 @@ public class KeyedBehavior extends Behavior {
 
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+	public void run(DeckList<String> message, MessageChannel channel) {
 
 		channel.sendMessage(value).queue();
 	}

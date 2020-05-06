@@ -37,17 +37,18 @@ public class CoreListener extends ListenerAdapter {
 		primaryContext = new GroupBehavior()
 				.setDefault(new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				String key = String.join(" ", message.getAll());
 				String value = Variables.get(key);
 				if(value != null) {
-					primaryContext.run(event, new DeckList<>(Arrays.asList(value.split(" "))), channel);
+					primaryContext.run(new DeckList<>(Arrays.asList(value.split(" "))), channel);
 				}
 			}
 		})
 				.add(new String[]{"rebellion", "!r"}, getRebellionBehavior())
 				.add(new String[]{"roll", "/roll", "!roll"}, getRollBehavior())
 				.add(new String[]{"var"}, Variables.getVarBehavior())
+				.add(new String[]{"pvar"}, Variables.getPVarBehavior())
 				.add(new String[]{"dc"}, CheckDC.getDCBehavior())
 				.add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
 				.add(new String[]{"item", "!i"}, new ItemBehavior())
@@ -56,7 +57,7 @@ public class CoreListener extends ListenerAdapter {
 				.add(new String[]{"armor", "!a"}, new ArmorBehavior())
 		.add(new String[]{"hey gary"}, new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				DieResult dieResult = rollDice("d20");
 				String saying = dieResult.getSum()>9 ? "pleased to meet you." : "so terribly, terribly disappointed in you";
 				channel.sendFile(GYGAX_GREETING, ".pleased_to_meet_you.jpg").queue();
@@ -80,7 +81,7 @@ public class CoreListener extends ListenerAdapter {
 	private Behavior getExitContextBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				currentListenerContext = ListenerContext.DEFAULT;
 			}
 		};
@@ -107,9 +108,9 @@ public class CoreListener extends ListenerAdapter {
 			}
 
 			if (currentListenerContext == ListenerContext.DEFAULT) {
-				primaryContext.run(event, message, channel);
+				primaryContext.run(message, channel);
 			}
-			defaultContext.run(event, message, channel);
+			defaultContext.run(message, channel);
 		} catch (Exception e) {
 			channel.sendMessage(">>>>>>>>>>>>>>ERROR\n" + e.getMessage()).queue();
 			throw e;
@@ -119,7 +120,7 @@ public class CoreListener extends ListenerAdapter {
 	private GroupBehavior getRebellionBehavior() {
 		Behavior updateRebellion = new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				Rebellion.writeOutRebellionToFile(currentRebellion);
 			}
 		};
@@ -129,7 +130,7 @@ public class CoreListener extends ListenerAdapter {
 		return new GroupBehavior()
 				.setDefault(new Behavior() {
 					@Override
-					public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+					public void run(DeckList<String> message, MessageChannel channel) {
 						if (!message.canDraw()) {
 							channel.sendMessage(currentRebellion.getSheet()).queue();
 						}
@@ -173,7 +174,7 @@ public class CoreListener extends ListenerAdapter {
 	private Behavior getRollBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				List<DieResult> dieResults = rollDiceGroups(message);
 				List<String> messages = Lists.newArrayList();
 				for(DieResult dieResult : dieResults) {

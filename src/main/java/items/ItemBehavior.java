@@ -18,7 +18,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.jsoup.Jsoup;
@@ -63,7 +62,7 @@ public class ItemBehavior extends Behavior{
 
 		Behavior categoryBehavior = new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				if (!message.canDraw()) {
 					List<String> categoryTitles = Lists.newArrayList(categoryMap.keys().elementSet());
 					channel.sendMessage("Categories:").queue();
@@ -73,7 +72,7 @@ public class ItemBehavior extends Behavior{
 				} else {
 					String key = String.join(" ", message.getDeck());
 					List<KeyedBehavior> items2 = categoryMap.get(key);
-					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key, "").run(event, message, channel);
+					BehaviorHelper.getAlphabetizedList(items2.stream().map(behavior -> String.join(", ",behavior.getKeys())).collect(Collectors.toList()), key, "").run(message, channel);
 				}
 			}
 
@@ -93,7 +92,7 @@ public class ItemBehavior extends Behavior{
 	private Behavior getSearchBehavior() {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				if(message.canDraw()){
 					String searchTerm = String.join(" ", message.getDeck());
 
@@ -163,8 +162,8 @@ public class ItemBehavior extends Behavior{
 
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
-		groupBehavior.run(event, message, channel);
+	public void run(DeckList<String> message, MessageChannel channel) {
+		groupBehavior.run(message, channel);
 	}
 
 	@Override

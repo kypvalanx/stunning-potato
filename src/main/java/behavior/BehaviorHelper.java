@@ -12,7 +12,7 @@ public class BehaviorHelper {
 	public static Behavior getAlphabetizedList(@NotNull final Collection<String> behaviorKeys, @NotNull final String listTitle, final String help) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				if (!behaviorKeys.isEmpty()) {
 					String keyList = behaviorKeys.stream().sorted()
 							.map(key -> String.join(", ", key)).collect(Collectors.joining("\n"));

@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.SetValuedMap;
 import org.jsoup.Jsoup;
@@ -141,7 +140,7 @@ public class WeaponsBehavior extends Behavior {
 	private Behavior getSearchBehavior(final SetValuedMap<String, String> searchIndex, final String help) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				if (message.canDraw()) {
 					String searchTerm = String.join(" ", message.getDeck());
 
@@ -163,7 +162,7 @@ public class WeaponsBehavior extends Behavior {
 	}
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+	public void run(DeckList<String> message, MessageChannel channel) {
 
 		List<String> payload = Lists.newArrayList(message.getDeck());
 
@@ -207,7 +206,7 @@ public class WeaponsBehavior extends Behavior {
 		    	weapon = mod.add(weapon);
 		    }
 
-			weapon.getWeaponStatBlockBehavior().run(event, message, channel);
+			weapon.getWeaponStatBlockBehavior().run(message, channel);
 			return;
 		}
 		else{
@@ -218,7 +217,7 @@ public class WeaponsBehavior extends Behavior {
 			}
 		}
 
-		groupBehavior.run(event, message, channel);
+		groupBehavior.run(message, channel);
 	}
 
 

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RulesLookupBehavior extends Behavior{
 
@@ -42,8 +41,8 @@ public class RulesLookupBehavior extends Behavior{
 	}
 
 	@Override
-	public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
-		behavior.run(event,message, channel);
+	public void run(DeckList<String> message, MessageChannel channel) {
+		behavior.run(message, channel);
 	}
 
 	@Override

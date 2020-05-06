@@ -25,7 +25,7 @@ public class NachoHelpBehavior extends Behavior
     }
 
     @Override
-    public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+    public void run(DeckList<String> message, MessageChannel channel) {
         List<String> messages = groupBehavior.getFormattedHelp(message, "");
 
         ChannelHelper.sendLongMessage("\n", String.join("\n", messages), channel);

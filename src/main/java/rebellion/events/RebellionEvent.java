@@ -550,7 +550,7 @@ public interface RebellionEvent {
 	public static Behavior getEventDoBehavior(Rebellion rebellion) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				channel.sendMessage("{" + eventNumber + "}").queue();
@@ -572,7 +572,7 @@ public interface RebellionEvent {
 	static Behavior getEventBehavior(Rebellion rebellion) {
 		return new Behavior() {
 			@Override
-			public void run(MessageReceivedEvent event, DeckList<String> message, MessageChannel channel) {
+			public void run(DeckList<String> message, MessageChannel channel) {
 				int eventNumber = getEventNumber(message, rebellion);
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				channel.sendMessage("{" + eventNumber + "}").queue();
