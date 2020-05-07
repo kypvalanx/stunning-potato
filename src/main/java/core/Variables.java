@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class Variables {
 
 	public static final String PERSONAL_DELIMITER = "###";
-	private static final String VAR_SET = "var_set";
+	public static final String VAR_SET = "var_set";
 	public static final String DEFAULT = "default";
 	private static File varFile = new File("resources/generated/vars.yaml");
 	private Map<String, String> personalVariables = new HashMap<>();
@@ -284,6 +284,32 @@ public class Variables {
 							channel.sendMessage("variable '" + key + "' removed").queue();
 						} else {
 							channel.sendMessage("variable '" + key + "' doesn't exist").queue();
+						}
+					}
+
+					@Override
+					public String getHelp(DeckList<String> s, String key) {
+						return "Removes a variable.";
+					}
+				})
+				.add(new String[]{"remove set", "r set"}, new Behavior() {
+					@Override
+					public void run(DeckList<String> message, MessageChannel channel) {
+						String key = String.join(" ", message.getDeck());
+
+						putP(VAR_SET, key);
+
+						for (Map.Entry<String, String> entry : entrySetP().stream().filter(e -> {
+							String[] tok = e.getKey().split(PERSONAL_DELIMITER);
+							return tok[0].equals(Context.getCaller().getAsMention()) && (tok[1].equals(key));
+						}).collect(Collectors.toList())) {
+							String[] tok = entry.getKey().split(PERSONAL_DELIMITER);
+							if (containsKeyP(tok[2])) {
+								removeP(tok[2]);
+								channel.sendMessage("variable '" + tok[2] + "' removed").queue();
+							} else {
+								channel.sendMessage("variable '" + tok[2] + "' doesn't exist").queue();
+							}
 						}
 					}
 

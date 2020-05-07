@@ -12,6 +12,7 @@ import items.ItemBehavior;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -95,6 +96,27 @@ public class CoreListener extends ListenerAdapter {
 		}
 		Context.setCaller(event.getAuthor());
 		MessageChannel channel = event.getChannel();
+
+		List<Message.Attachment> attachments = event.getMessage().getAttachments();
+		for(Message.Attachment attachment: attachments){
+			if("xml".equals(attachment.getFileExtension())){
+				MessageChannel finalChannel = channel;
+				Thread async = new Thread(() -> {
+					try {
+						File file = attachment.downloadToFile().get();
+
+						String author = Context.getCaller().getAsMention();
+						String varSet = new PCGVarLoader(file, author).add();
+						finalChannel.sendMessage("added character sheet to "+varSet).queue();
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+				});
+				async.start();
+			}
+		}
+
+
 		try {
 			final String key = event.getMessage().getContentRaw().toLowerCase().trim();
 
@@ -116,6 +138,7 @@ public class CoreListener extends ListenerAdapter {
 			throw e;
 		}
 	}
+
 
 	private GroupBehavior getRebellionBehavior() {
 		Behavior updateRebellion = new Behavior() {
@@ -195,5 +218,4 @@ public class CoreListener extends ListenerAdapter {
 			}
 		};
 	}
-
 }
