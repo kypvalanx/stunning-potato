@@ -3,3 +3,4 @@
 /.gradle/
 resources/config
 resources/generated
+resources/save

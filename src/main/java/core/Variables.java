@@ -27,10 +27,10 @@ public class Variables {
 	public static final String VAR_SET = "var_set";
 	public static final String DEFAULT = "default";
 	private static File varFile = new File("resources/generated/vars.yaml");
-	private Map<String, String> personalVariables = new HashMap<>();
-	private Map<String, String> variables = new HashMap<>();
+	private volatile Map<String, String> personalVariables = new HashMap<>();
+	private volatile Map<String, String> variables = new HashMap<>();
 
-	private static Variables variablesO;
+	private volatile static Variables variablesO;
 
 
 	private Variables(File varFile){
@@ -175,7 +175,7 @@ public class Variables {
 				.add(new String[]{"add", "set"}, new Behavior() {
 					@Override
 					public void run(DeckList<String> message, MessageChannel channel) {
-						String key = message.draw();
+						String key = message.draw().replace("_", " ");
 						String value = String.join(" ", message.getDeck());
 						if (value.isBlank()) {
 							channel.sendMessage("variable " + key + " requires value").queue();
@@ -260,7 +260,7 @@ public class Variables {
 				.add(new String[]{"add", "set"}, new Behavior() {
 					@Override
 					public void run(DeckList<String> message, MessageChannel channel) {
-						String key = message.draw();
+						String key = message.draw().replace("_", " ");
 						String value = String.join(" ", message.getDeck());
 						if (value.isBlank()) {
 							channel.sendMessage("variable " + key + " requires value").queue();
@@ -299,23 +299,26 @@ public class Variables {
 
 						putP(VAR_SET, key);
 
-						for (Map.Entry<String, String> entry : entrySetP().stream().filter(e -> {
+						Set<Map.Entry<String, String>> entries = Set.copyOf(entrySetP());
+						String messages = entries.stream().filter(e -> {
 							String[] tok = e.getKey().split(PERSONAL_DELIMITER);
 							return tok[0].equals(Context.getCaller().getAsMention()) && (tok[1].equals(key));
-						}).collect(Collectors.toList())) {
+						}).map(entry -> {
 							String[] tok = entry.getKey().split(PERSONAL_DELIMITER);
 							if (containsKeyP(tok[2])) {
 								removeP(tok[2]);
-								channel.sendMessage("variable '" + tok[2] + "' removed").queue();
+								return "variable '" + tok[2] + "' removed";
 							} else {
-								channel.sendMessage("variable '" + tok[2] + "' doesn't exist").queue();
+								return "variable '" + tok[2] + "' doesn't exist";
 							}
-						}
+						})
+								.collect(Collectors.joining("\n"));
+						ChannelHelper.sendLongMessage("\n",messages, channel);
 					}
 
 					@Override
 					public String getHelp(DeckList<String> s, String key) {
-						return "Removes a variable.";
+						return "Removes a variable set.";
 					}
 				})
 				.add(new String[]{"list"}, new Behavior() {
@@ -327,7 +330,7 @@ public class Variables {
 							return tok[0].equals(Context.getCaller().getAsMention()) && (tok[1].equals(getVarSet()) || tok[1].equals(DEFAULT));
 						}).collect(Collectors.toList())) {
 							String[] tokens = entry.getKey().split(PERSONAL_DELIMITER);
-							builder.append(tokens[1]).append(" ").append(tokens[2]).append(" => ").append(entry.getValue()).append("\n");
+							builder.append("*").append(tokens[1]).append("* ").append(tokens[2]).append(" => ").append(entry.getValue()).append("\n");
 						}
 						String text = builder.toString();
 						if(text.length() > 0) {
@@ -361,11 +364,6 @@ public class Variables {
 	}
 
 	public static String findVariable(String key) {
-		String value = get(key);
-
-		if (value == null) {
-			throw new IllegalStateException("couldn't find " + key);
-		}
-		return value;
+		return get(key);
 	}
 }

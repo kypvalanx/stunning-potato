@@ -9,7 +9,7 @@ public class PCGVarLoaderTest {
 
     @Test
     public void basicTest(){
-        PCGVarLoader pcgVarLoader = new PCGVarLoader(new File("src/test/resources/generic.xml"), "mock");
+        PCGVarLoader pcgVarLoader = new PCGVarLoader(new File("src/test/resources/generic.xml"));
 
         assertThat(pcgVarLoader.getVars().get("bab")).isEqualTo("4");
         assertThat(pcgVarLoader.getVars().get("str")).isEqualTo("0");
