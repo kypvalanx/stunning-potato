@@ -40,88 +40,22 @@ public class PCGVarLoader {
 
             vars.put("bab", ""+Integer.parseInt(bab.getTextContent()));
 
-            NodeList abilities = ((Element) root.getElementsByTagName("abilities").item(0)).getElementsByTagName("ability");
-
-            for(int i = 0; i < abilities.getLength(); i++){
-                Element ability = (Element)abilities.item(i);
-
-                String key = ability.getElementsByTagName("short").item(0).getTextContent().toLowerCase();
-                String value = ""+Integer.parseInt(ability.getElementsByTagName("modifier").item(0).getTextContent());
-                vars.put(key, value);
-            }
+            extractSkills(root, "abilities", "ability", "short", "", "modifier");
 
 
-            Node initiative = ((Element) root.getElementsByTagName("initiative").item(0)).getElementsByTagName("total").item(0);
-
-            vars.put("init", "d20 + "+Integer.parseInt(initiative.getTextContent()));
+            extractInititive(root);
 
 
-            NodeList skills = ((Element) root.getElementsByTagName("skills").item(0)).getElementsByTagName("skill");
-            for(int i = 0; i < skills.getLength(); i++){
-                Element skill = (Element)skills.item(i);
+            extractSkills(root, "skills", "skill", "name", "d20 + ", "skill_mod");
 
-                String key = skill.getElementsByTagName("name").item(0).getTextContent().toLowerCase();
-                String value = "d20 + "+Integer.parseInt(skill.getElementsByTagName("skill_mod").item(0).getTextContent());
-                vars.put(key, value);
-            }
+            extractSkills(root, "saving_throws", "saving_throw", "short", "d20 + ", "total");
 
-            NodeList savingThrows = ((Element) root.getElementsByTagName("saving_throws").item(0)).getElementsByTagName("saving_throw");
+            extractCombatManeuvers(root);
 
-            for(int i = 0; i < savingThrows.getLength(); i++){
-                Element savingThrow = (Element)savingThrows.item(i);
-
-                String key = savingThrow.getElementsByTagName("short").item(0).getTextContent().toLowerCase();
-                String value = "d20 + "+Integer.parseInt(savingThrow.getElementsByTagName("total").item(0).getTextContent());
-                vars.put(key, value);
-            }
-
-            NodeList combatManeuvers = ((Element) root.getElementsByTagName("attack").item(0)).getElementsByTagName("cmb");
-
-            for(int i = 0; i < combatManeuvers.getLength(); i++){
-                Element combatManeuver = (Element)combatManeuvers.item(i);
-
-                String[] tokens = combatManeuver.getTagName().split("_");
-
-                if(tokens.length>1 && "attack".equals(tokens[1])){
-                    String key = tokens[0];
-                    String value = "d20 + "+Integer.parseInt(combatManeuver.getTextContent());
-                    vars.put(key, value);
-                }
-            }
-
-            String unarmedName = "unarmed";
-            String unarmedCrit = getElementByTagPath(root, "weapons", "unarmed", "critical").getTextContent().toLowerCase();
-            String unarmedReach = getElementByTagPath(root, "weapons", "unarmed",  "reach").getTextContent().toLowerCase();
-            String unarmedDamage = getElementByTagPath(root, "weapons", "unarmed", "damage").getTextContent().toLowerCase();
-            String unarmedAttack = getElementByTagPath(root, "weapons", "unarmed",  "total").getTextContent().toLowerCase();
-
-            String unarmedValue = "'" + unarmedName + " : " + unarmedCrit + " : "+ unarmedReach + " and 'attack and c20 + " + unarmedDamage + " and 'damage: and " + unarmedAttack;
-            vars.put(unarmedName, unarmedValue);
+            extractUnarmedStrike(root);
 
 
-            NodeList weapons = ((Element)root.getElementsByTagName("weapons").item(0)).getElementsByTagName("weapon");
-
-            for(int i = 0; i < weapons.getLength(); i++){
-                Node item = weapons.item(i);
-
-                if(!(item instanceof Element)){
-                    continue;
-                }
-
-                Element weapon = (Element) item;
-
-                String name = cleanVarKey(getElementByTagPath(weapon, "common", "name", "output").getTextContent().toLowerCase());
-                String range = getElementByTagPath(weapon, "common", "critical", "range").getTextContent().toLowerCase();
-                String multiplier = getElementByTagPath(weapon, "common", "critical", "multiplier").getTextContent().toLowerCase();
-                String reach = getElementByTagPath(weapon, "common", "reach").getTextContent().toLowerCase();
-                String damage = getElementByTagPath(weapon, "common", "damage").getTextContent().toLowerCase();
-                String attack = getElementByTagPath(weapon, "common", "to_hit", "total_hit").getTextContent().toLowerCase();
-
-                String value = "'" + name + " : " + range + "/" + multiplier + "x : "+ reach + " and 'attack and "+rangeSize(range)+"c20 + " + attack + " and 'damage: and " + damage;
-                vars.put(name, value);
-
-
-            }
+            extractWeapons(root);
 
             vars.put("range", "bab + dex");
             vars.put("melee", "bab + str");
@@ -144,6 +78,104 @@ public class PCGVarLoader {
             e.printStackTrace();
         }
 
+    }
+
+    private void extractWeapons(Element root) {
+        NodeList weapons = ((Element)root.getElementsByTagName("weapons").item(0)).getElementsByTagName("weapon");
+
+        for(int i = 0; i < weapons.getLength(); i++){
+            Node item = weapons.item(i);
+
+            if(!(item instanceof Element)){
+                continue;
+            }
+
+            Element weapon = (Element) item;
+
+            String name = cleanVarKey(getElementByTagPath(weapon, "common", "name", "output").getTextContent().toLowerCase());
+            String range = getElementByTagPath(weapon, "common", "critical", "range").getTextContent().toLowerCase();
+            String multiplier = getElementByTagPath(weapon, "common", "critical", "multiplier").getTextContent().toLowerCase();
+            String reach = getElementByTagPath(weapon, "common", "reach").getTextContent().toLowerCase();
+            String damage = getElementByTagPath(weapon, "common", "damage").getTextContent().toLowerCase();
+            String attack = getElementByTagPath(weapon, "common", "to_hit", "total_hit").getTextContent().toLowerCase();
+
+            NodeList specificHandedWeapons = getElementByTagPath(weapon, "melee").getChildNodes();
+            for(int j = 0; j < specificHandedWeapons.getLength(); j++){
+
+                Node rawNode = specificHandedWeapons.item(j);
+                if(!(rawNode instanceof Element)){
+                    continue;
+                }
+
+                Element specificHandedWeapon = ((Element) rawNode);
+                String suffix = specificHandedWeapon.getTagName();
+
+                Element damageNode = getElementByTagPath(specificHandedWeapon, "damage");
+                Element toHitNode = getElementByTagPath(specificHandedWeapon, "to_hit");
+                if(damageNode!=null && toHitNode!=null) {
+                    String specificDamage = damageNode.getTextContent().toLowerCase();
+                    String specificAttack = toHitNode.getTextContent().toLowerCase();
+
+                    if(!"N/A".equals(specificAttack) && !"N/A".equals(specificDamage)){
+                        createWeaponRoll(name, "_"+suffix, range, multiplier, reach, specificDamage, specificAttack);
+                    }
+                }
+            }
+
+            createWeaponRoll(name, "", range, multiplier, reach, damage, attack);
+
+
+        }
+    }
+
+    private void createWeaponRoll(String name, String suffix, String range, String multiplier, String reach, String damage, String attack) {
+        String value = "'" + name + " : " + range + "/" + multiplier + "x : "+ reach + " and 'attack: and "+rangeSize(range)+"c20 " + attack + " and 'damage: and " + damage;
+        vars.put(name + suffix, value);
+    }
+
+    private void extractUnarmedStrike(Element root) {
+        String unarmedName = "unarmed";
+        String unarmedCrit = getElementByTagPath(root, "weapons", "unarmed", "critical").getTextContent().toLowerCase();
+        String unarmedReach = getElementByTagPath(root, "weapons", "unarmed",  "reach").getTextContent().toLowerCase();
+        String unarmedDamage = getElementByTagPath(root, "weapons", "unarmed", "damage").getTextContent().toLowerCase();
+        String unarmedAttack = getElementByTagPath(root, "weapons", "unarmed",  "total").getTextContent().toLowerCase();
+
+        String unarmedValue = "'" + unarmedName + " : " + unarmedCrit + " : "+ unarmedReach + " and 'attack and c20 + " + unarmedDamage + " and 'damage: and " + unarmedAttack;
+        vars.put(unarmedName, unarmedValue);
+    }
+
+    private void extractCombatManeuvers(Element root) {
+        NodeList combatManeuvers = ((Element) root.getElementsByTagName("attack").item(0)).getElementsByTagName("cmb");
+
+        for(int i = 0; i < combatManeuvers.getLength(); i++){
+            Element combatManeuver = (Element)combatManeuvers.item(i);
+
+            String[] tokens = combatManeuver.getTagName().split("_");
+
+            if(tokens.length>1 && "attack".equals(tokens[1])){
+                String key = tokens[0];
+                String value = "d20 + "+Integer.parseInt(combatManeuver.getTextContent());
+                vars.put(key, value);
+            }
+        }
+    }
+
+    private void extractSkills(Element root, String skills2, String skill2, String name2, String s, String skill_mod) {
+        NodeList skills = ((Element) root.getElementsByTagName(skills2).item(0)).getElementsByTagName(skill2);
+        for (int i = 0; i < skills.getLength(); i++) {
+            Element skill = (Element) skills.item(i);
+
+            String key = skill.getElementsByTagName(name2).item(0).getTextContent().toLowerCase();
+            String value = s + Integer.parseInt(skill.getElementsByTagName(skill_mod).item(0).getTextContent());
+            vars.put(key, value);
+        }
+    }
+
+    private void extractInititive(Element root) {
+        Node initiative = ((Element) root.getElementsByTagName("initiative").item(0)).getElementsByTagName("total").item(0);
+
+        vars.put("init", "d20 + "+Integer.parseInt(initiative.getTextContent()));
+        vars.put("initiative", "d20 + "+Integer.parseInt(initiative.getTextContent()));
     }
 
     private int rangeSize(String range) {

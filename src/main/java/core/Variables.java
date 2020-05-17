@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -328,7 +329,7 @@ public class Variables {
 						for (Map.Entry<String, String> entry : entrySetP().stream().filter(e -> {
 							String[] tok = e.getKey().split(PERSONAL_DELIMITER);
 							return tok[0].equals(Context.getCaller().getAsMention()) && (tok[1].equals(getVarSet()) || tok[1].equals(DEFAULT));
-						}).collect(Collectors.toList())) {
+						}).sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
 							String[] tokens = entry.getKey().split(PERSONAL_DELIMITER);
 							builder.append("*").append(tokens[1]).append("* ").append(tokens[2]).append(" => ").append(entry.getValue()).append("\n");
 						}
