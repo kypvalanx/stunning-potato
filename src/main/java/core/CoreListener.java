@@ -219,10 +219,11 @@ public class CoreListener extends ListenerAdapter {
                 List<DieResult> dieResults = rollDiceGroups(message);
                 List<String> messages = Lists.newArrayList();
                 for (DieResult dieResult : dieResults) {
-                    if (dieResult.getMessage() != null) {
+                    if (dieResult.getSteps() == null) {
                         messages.add(dieResult.getMessage());
                     } else {
-                        messages.add(Context.getCaller().getAsMention() + " rolls " + dieResult.getSum());
+                        messages.add(Context.getCaller().getAsMention() + " rolls " + dieResult.getMessage());
+                        messages.add("" + dieResult.getSum());
                         messages.add(dieResult.getSteps());
                         CheckDC.attemptCheck(dieResult.getSum(), channel);
                     }

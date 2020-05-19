@@ -16,6 +16,7 @@ public class DieParser {
 	private final List<String> steps = new ArrayList<>();
 	private static final Random RAND = new Random();
 	public static final Pattern P = Pattern.compile("\\([\\w\\s]*\\)");
+	private String dieEquation;
 
 	@Deprecated
 	public static DieResult rollDice(DeckList<String> dieEquation) {
@@ -48,21 +49,14 @@ public class DieParser {
 			return Lists.newArrayList(new DieResult(dieEquation.substring(1)));
 		}
 
-		String digest = dieEquation.replace("-", "+-");
-		String[] values = digest.split("\\+");
+		String[] values = resolveValues(dieEquation);
+
 
 		int sum = Arrays.stream(values)
 				.filter(Objects::nonNull)
 				.filter(s -> !s.isBlank())
 				.map(String::trim)
 				.map(value -> {
-					while(P.matcher(value).find()){
-						value = resolveParens(value);
-					}
-
-					while (Variables.findVariable(value) != null){
-						value = resolveVars(value);
-					}
 
 					int subtract = 1;
 					if (value.startsWith("-")) {
@@ -72,7 +66,38 @@ public class DieParser {
 					return getValue(value.trim(), subtract);
 				}).reduce(0, Integer::sum);
 
-		return Lists.newArrayList(new DieResult(sum, "{ " + String.join(" + ", " " + steps).replace(" + -", " - ") + " }"));
+		return Lists.newArrayList(new DieResult(sum, "{ " + String.join(" + ", " " + steps).replace(" + -", " - ") + " }", String.join(" + ", values)));
+	}
+
+	@NotNull
+	private String[] resolveValues(@NotNull String dieEquation) {
+		String digest = dieEquation.replace("-", "+-");
+
+		String[] values = digest.split("\\+");
+
+		boolean hasChanged = true;
+		while (hasChanged){
+			hasChanged = false;
+			for(int i = 0; i < values.length; i++) {
+				values[i] = values[i].trim();
+
+				while (P.matcher(values[i]).find()) {
+					values[i] = resolveParens(values[i]);
+					hasChanged = true;
+				}
+
+				while (Variables.findVariable(values[i]) != null) {
+					values[i] = resolveVars(values[i]);
+					hasChanged = true;
+				}
+			}
+			if(hasChanged){
+				digest = String.join("+", values);
+				values = digest.split("\\+");
+			}
+
+		}
+		return values;
 	}
 
 	private int getValue(String value, int subtract) {
@@ -105,8 +130,7 @@ public class DieParser {
 	}
 
 	private String resolveVars(String var) {
-		String value = Variables.findVariable(var);
-		return ""+rollDice(value).getSum();
+		return Variables.findVariable(var);
 	}
 
 	private int parseConfirmableDieExpression(String value, int subtract) {

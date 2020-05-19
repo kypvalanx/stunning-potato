@@ -7,9 +7,10 @@ public class DieResult {
 	private String steps;
 	private int sum;
 
-	public DieResult(int sum, String steps) {
+	public DieResult(int sum, String steps, String message) {
 		this.sum = sum;
 		this.steps = steps;
+		this.message = message;
 	}
 
 	public DieResult(String message) {
