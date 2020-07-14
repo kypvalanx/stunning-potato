@@ -297,7 +297,7 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				currentRebellion.setSpyMaster(message.getDeck());
-				channel.sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterDexOrIntBonus()).queue();
+				channel.sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterSecrecyBonus()).queue();
 				followUpBehavior.run(message, channel);
 			}
 
@@ -314,7 +314,7 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				currentRebellion.setSentinal(message.getDeck());
-				channel.sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelConOrChaBonus() + ", " + currentRebellion.getSentinelStrOrWisBonus() + ", " + currentRebellion.getSentinelDexOrIntBonus()).queue();
+				channel.sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelLoyaltyBonus() + ", " + currentRebellion.getSentinelSecurityBonus() + ", " + currentRebellion.getSentinelSecrecyBonus()).queue();
 				followUpBehavior.run(message, channel);
 			}
 
@@ -348,7 +348,7 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				currentRebellion.setPartisan(message.getDeck());
-				channel.sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanStrOrWisBonus()).queue();
+				channel.sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanSecurityBonus()).queue();
 				followUpBehavior.run(message, channel);
 			}
 
@@ -365,7 +365,7 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				currentRebellion.setDemagogue(message.getDeck());
-				channel.sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueConOrChaBonus()).queue();
+				channel.sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueLoyaltyBonus()).queue();
 				followUpBehavior.run(message, channel);
 			}
 
