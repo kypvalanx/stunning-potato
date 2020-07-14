@@ -6,7 +6,6 @@ import behavior.ChannelHelper;
 import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
 import com.google.common.collect.Lists;
-import static core.DieParser.rollDice;
 import static core.DieParser.rollDiceGroups;
 import items.ItemBehavior;
 import java.io.File;
@@ -61,7 +60,8 @@ public class CoreListener extends ListenerAdapter {
                 .add(new String[]{"hey gary"}, new Behavior() {
                     @Override
                     public void run(DeckList<String> message, MessageChannel channel) {
-                        DieResult dieResult = rollDice("d20");
+
+                        DieResult dieResult = rollDiceGroups("d20").get(0);
                         String saying = dieResult.getSum() > 9 ? "pleased to meet you." : "so terribly, terribly disappointed in you";
                         channel.sendFile(GYGAX_GREETING, ".pleased_to_meet_you.jpg").queue();
                         channel.sendMessage("I am ... \n @GaryBot rolls " + dieResult.getSum() + "\n" + dieResult.getSteps() + "\n ... " + saying).queue();

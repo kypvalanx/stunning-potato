@@ -364,7 +364,4 @@ public class Variables {
 				});
 	}
 
-	public static String findVariable(String key) {
-		return get(key);
-	}
 }

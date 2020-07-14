@@ -4,7 +4,7 @@ import behavior.Behavior;
 import behavior.NachoHelpBehavior;
 import core.CheckDC;
 import core.DeckList;
-import static core.DieParser.rollDice;
+import core.DieParser;
 import core.DieResult;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -30,7 +30,8 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				if(message.canDraw()){
-					currentRebellion.addSupporters(rollDice(message).getSum());
+
+					currentRebellion.addSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 				}
 
 				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
@@ -49,7 +50,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addSupporters(-rollDice(message).getSum());
+
+				currentRebellion.addSupporters(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
 				followUpBehavior.run(message, channel);
@@ -67,7 +69,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addSupporters(rollDice(message).getSum());
+
+				currentRebellion.addSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
 				followUpBehavior.run(message, channel);
@@ -84,7 +87,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.setSupporters(rollDice(message).getSum());
+
+				currentRebellion.setSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
 				followUpBehavior.run(message, channel);
@@ -103,7 +107,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addMembers(-rollDice(message).getSum());
+
+				currentRebellion.addMembers(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(message, channel);
@@ -121,7 +126,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addMembers(rollDice(message).getSum());
+
+				currentRebellion.addMembers(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(message, channel);
@@ -139,7 +145,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addNotoriety(-rollDice(message).getSum());
+
+				currentRebellion.addNotoriety(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(message, channel);
@@ -157,7 +164,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addNotoriety(rollDice(message).getSum());
+
+				currentRebellion.addNotoriety(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
 				followUpBehavior.run(message, channel);
@@ -175,7 +183,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addPopulation(-rollDice(message).getSum());
+
+				currentRebellion.addPopulation(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
 				followUpBehavior.run(message, channel);
@@ -193,7 +202,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addPopulation(rollDice(message).getSum());
+
+				currentRebellion.addPopulation(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
 				followUpBehavior.run( message, channel);
@@ -211,7 +221,8 @@ public class RebellionBehaviors {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
 				if(message.canDraw()){
-					currentRebellion.addTreasury(rollDice(message).getSum());
+
+					currentRebellion.addTreasury(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 				}
 
 				channel.sendMessage("Treasury " + currentRebellion.getTreasury()).queue();
@@ -230,7 +241,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addTreasury(-rollDice(message).getSum());
+
+				currentRebellion.addTreasury(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
 				followUpBehavior.run(message, channel);
@@ -248,7 +260,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.addTreasury(rollDice(message).getSum());
+
+				currentRebellion.addTreasury(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
 				followUpBehavior.run(message, channel);
@@ -386,7 +399,8 @@ public class RebellionBehaviors {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				currentRebellion.setMaxRank(rollDice(message).getSum());
+
+				currentRebellion.setMaxRank(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 				channel.sendMessage("Max Level Set: " + currentRebellion.getRebellionMaxLevel()).queue();
 				followUpBehavior.run(message, channel);
 			}
@@ -449,9 +463,11 @@ public class RebellionBehaviors {
 	private void rollCheck(DeckList<String> message, int bonus, MessageChannel channel) {
 		DieResult dieResult;
 		if (!message.canDraw()) {
-			dieResult = rollDice("1d20+" + bonus);
+
+			dieResult = DieParser.rollDiceGroups("1d20+" + bonus).get(0);
 		} else {
-			dieResult = rollDice(String.join(" ", message.getDeck()) + "+" + bonus);
+
+			dieResult = DieParser.rollDiceGroups(String.join(" ", message.getDeck()) + "+" + bonus).get(0);
 		}
 		channel.sendMessage(" " + dieResult.getSum()).queue();
 		channel.sendMessage(" " + dieResult.getSteps()).queue();

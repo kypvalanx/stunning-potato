@@ -6,6 +6,7 @@ public class DieResult {
 	private String message;
 	private String steps;
 	private int sum;
+	private boolean freeze = false;
 
 	public DieResult(int sum, String steps, String message) {
 		this.sum = sum;
@@ -36,5 +37,15 @@ public class DieResult {
 				.add("sum", sum)
 				.add("message", message)
 				.toString();
+	}
+
+	public void freeze() {
+		if(freeze){
+			throw new IllegalStateException("WTF this is frozen");
+		}
+		if(steps != null) {
+			freeze = true;
+			steps = "{ " + steps + " }";
+		}
 	}
 }

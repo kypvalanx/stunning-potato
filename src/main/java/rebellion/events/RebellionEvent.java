@@ -2,9 +2,8 @@ package rebellion.events;
 
 import behavior.Behavior;
 import core.DeckList;
-import static core.DieParser.rollDice;
+import core.DieParser;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import rebellion.Rebellion;
 
@@ -588,7 +587,8 @@ public interface RebellionEvent {
 
 	static int getEventNumber(DeckList<String> message, Rebellion rebellion) {
 		if (!message.canDraw()) {
-			return rollDice("1d100" + "+" + rebellion.getDangerRating()).getSum();
+
+			return DieParser.rollDiceGroups("1d100" + "+" + rebellion.getDangerRating()).get(0).getSum();
 		} else {
 			return Integer.parseInt(String.join(" ", message.getDeck()));
 		}

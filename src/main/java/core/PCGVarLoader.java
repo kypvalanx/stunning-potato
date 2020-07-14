@@ -71,9 +71,6 @@ public class PCGVarLoader {
 
             vars.put("level", getElementByTagPath(root, "basics", "classes", "levels_total").getTextContent().toLowerCase());
 
-
-            System.out.println(root);
-
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +126,7 @@ public class PCGVarLoader {
     }
 
     private void createWeaponRoll(String name, String suffix, String range, String multiplier, String reach, String damage, String attack) {
-        String value = "'" + name + " : " + range + "/" + multiplier + "x : "+ reach + " and 'attack: and "+rangeSize(range)+"c20 " + attack + " and 'damage: and " + damage;
+        String value = "'" + name + " : " + range + "/" + multiplier + "x : "+ reach + DieParser.AND + "'attack:"+ DieParser.AND +rangeSize(range)+"c20 " + attack + DieParser.AND + "'damage:" + DieParser.AND + damage;
         vars.put(name + suffix, value);
     }
 
@@ -140,7 +137,7 @@ public class PCGVarLoader {
         String unarmedDamage = getElementByTagPath(root, "weapons", "unarmed", "damage").getTextContent().toLowerCase();
         String unarmedAttack = getElementByTagPath(root, "weapons", "unarmed",  "total").getTextContent().toLowerCase();
 
-        String unarmedValue = "'" + unarmedName + " : " + unarmedCrit + " : "+ unarmedReach + " and 'attack and c20 + " + unarmedDamage + " and 'damage: and " + unarmedAttack;
+        String unarmedValue = "'" + unarmedName + " : " + unarmedCrit + " : "+ unarmedReach + DieParser.AND + "'attack" + DieParser.AND + "c20 + " + unarmedDamage + DieParser.AND + "'damage:" + DieParser.AND + unarmedAttack;
         vars.put(unarmedName, unarmedValue);
     }
 

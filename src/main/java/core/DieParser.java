@@ -1,6 +1,5 @@
 package core;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,94 +12,105 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 
 public class DieParser {
-	private final List<String> steps = new ArrayList<>();
 	private static final Random RAND = new Random();
 	public static final Pattern P = Pattern.compile("\\([\\w\\s]*\\)");
-	private String dieEquation;
-
-	@Deprecated
-	public static DieResult rollDice(DeckList<String> dieEquation) {
-		return rollDice(String.join(" ", dieEquation.getDeck()));
-	}
-
-	@Deprecated
-	public static DieResult rollDice(@NotNull String dieEquation) {
-
-		return new DieParser()._rollDice(dieEquation).get(0);
-	}
+	public static final String AND = " and ";
 
 	public static List<DieResult> rollDiceGroups(DeckList<String> dieEquation) {
 		return rollDiceGroups(String.join(" ", dieEquation.getDeck()));
 	}
 
 	public static List<DieResult> rollDiceGroups(@NotNull String dieEquation) {
-		String[] dieEquations = dieEquation.split(" and ");
-
-		return Arrays.stream(dieEquations).map(eq -> new DieParser()._rollDice(eq)).flatMap(List::stream).collect(Collectors.toList());
+		List<DieResult> dieResults = _rollDice(dieEquation);
+		dieResults.forEach(DieResult::freeze);
+		return dieResults;
 	}
 
-	private List<DieResult> _rollDice(@NotNull String dieEquation) {
+	private static List<DieResult> _rollDice(@NotNull String dieEquation) {
 		if (dieEquation.startsWith("roll ")) {
 			System.err.println("getValue Die Value being called with dirty payload: " + dieEquation);
 			dieEquation = dieEquation.substring(5);
 		}
+
 		dieEquation = dieEquation.trim();
-		if(dieEquation.startsWith("'") || dieEquation.startsWith("`")){
-			return Lists.newArrayList(new DieResult(dieEquation.substring(1)));
-		}
 
-		String[] values = resolveValues(dieEquation);
+		String[] equations = reduceEquations(dieEquation);
 
-
-		int sum = Arrays.stream(values)
+		return Arrays.stream(equations)
 				.filter(Objects::nonNull)
 				.filter(s -> !s.isBlank())
 				.map(String::trim)
-				.map(value -> {
-
-					int subtract = 1;
-					if (value.startsWith("-")) {
-						value = value.substring(1);
-						subtract = -1;
-					}
-					return getValue(value.trim(), subtract);
-				}).reduce(0, Integer::sum);
-
-		return Lists.newArrayList(new DieResult(sum, "{ " + String.join(" + ", " " + steps).replace(" + -", " - ") + " }", String.join(" + ", values)));
+				.map(eq -> {
+					String[] parts = eq.split("\\+");
+					return Arrays.stream(parts).map(DieParser::getValue).reduce(
+							(dieResult, dieResult2) -> new DieResult(dieResult.getSum() + dieResult2.getSum(),
+									join(" + ", dieResult.getSteps(), dieResult2.getSteps()),
+									dieResult.getMessage() + " " + dieResult2.getMessage()));
+				}).map(o -> o.orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	@NotNull
-	private String[] resolveValues(@NotNull String dieEquation) {
-		String digest = dieEquation.replace("-", "+-");
+	private static String join(String delimiter, String... steps) {
+		final String[] response = {""};
 
-		String[] values = digest.split("\\+");
+		Arrays.stream(steps).filter(s -> s != null && !s.isEmpty()).forEach(s -> {
+			if(!response[0].isEmpty()){
+				response[0] += delimiter;
+			}
+			response[0] += s;
+		});
 
+		return response[0];
+	}
+
+	private static String[] reduceEquations(@NotNull String equation) {
 		boolean hasChanged = true;
-		while (hasChanged){
+		String[] equationStrings = new String[0];
+		while (hasChanged) {
 			hasChanged = false;
-			for(int i = 0; i < values.length; i++) {
-				values[i] = values[i].trim();
+			equationStrings = equation.split(AND);
 
-				while (P.matcher(values[i]).find()) {
-					values[i] = resolveParens(values[i]);
-					hasChanged = true;
+			for (int i = 0; i < equationStrings.length; i++) {
+				if(equationStrings[i].startsWith("`") || equationStrings[i].startsWith("'")){
+					continue;
 				}
+				equationStrings[i] = equationStrings[i].replace("-", "+-");
+				String[] values = equationStrings[i].split("\\+");
 
-				while (Variables.findVariable(values[i]) != null) {
-					values[i] = resolveVars(values[i]);
-					hasChanged = true;
+				for (int j = 0; j < values.length; j++) {
+					values[j] = values[j].trim();
+
+					while (P.matcher(values[j]).find()) {
+						values[j] = resolveParens(values[j]);
+						hasChanged = true;
+					}
+
+					while (Variables.get(values[j]) != null) {
+						values[j] = Variables.get(values[j]);
+						hasChanged = true;
+					}
 				}
-			}
-			if(hasChanged){
-				digest = String.join("+", values);
-				values = digest.split("\\+");
+				equationStrings[i] = String.join("+", values);
 			}
 
+			if(hasChanged) {
+				equation = String.join(AND, equationStrings);
+			}
 		}
-		return values;
+		return equationStrings;
 	}
 
-	private int getValue(String value, int subtract) {
+	private static DieResult getValue(String value) {
+		if(value.startsWith("'") || value.startsWith("`")){
+			return new DieResult(value.substring(1));
+		}
+
+		int subtract = 1;
+		if (value.startsWith("-")) {
+			value = value.substring(1).trim();
+			subtract = -1;
+		}
+
+
 		if (value.matches("\\d*d\\d+")) {
 			return parseDieExpression(value, subtract);
 		} else if (value.matches("\\d*e\\d+")) {
@@ -109,31 +119,28 @@ public class DieParser {
 			return parseConfirmableDieExpression(value,subtract);
 		} else if (value.matches("\\d+")) {
 			int parsed = Integer.parseInt(value) * subtract;
-			steps.add(""+parsed);
-			return parsed;
+			return new DieResult(parsed, "" + parsed, "");
 		}
 
 		throw new IllegalStateException(value + " Cannot be parsed or variable does not exist.");
 	}
 
 	@NotNull
-	private String resolveParens(String value) {
+	private static String resolveParens(String value) {
 		Matcher matcher = P.matcher(value);
 		while(matcher.find()){
 			String group = matcher.group();
 			String dieEquation = group.substring(1, group.length() - 1);
-			String newValue = ""+rollDice(dieEquation).getSum();
+
+			String newValue = ""+ rollDiceGroups(dieEquation).get(0).getSum();
 			value = value.replaceFirst(Pattern.quote(group), newValue);
 		}
 
 		return value;
 	}
 
-	private String resolveVars(String var) {
-		return Variables.findVariable(var);
-	}
-
-	private int parseConfirmableDieExpression(String value, int subtract) {
+	private static DieResult parseConfirmableDieExpression(String value, int subtract) {
+		List<String> steps = new ArrayList<>();
 		String[] tokens = value.split("c");
 		int range = tokens[0].isBlank()? 1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);
@@ -147,23 +154,22 @@ public class DieParser {
 
 			steps.add("CONFIRMATION DIE ROLL: "+confirm);
 		}
-		return roll;
+		return new DieResult(roll, join(" + ", steps.toArray(new String[0])), "");
 	}
 
-	private int parseExplodingDieExpression(String value, int subtract) {
+	private static DieResult parseExplodingDieExpression(String value, int subtract) {
+		List<String> steps = new ArrayList<>();
+
 		String[] tokens = value.split("e");
 		Integer times = null;
 
 		if(!tokens[0].isBlank()){
 			times = Integer.parseInt(tokens[0]);
-//			if(subtract< 0){
-//				throw new IllegalStateException("Exploding dice may not have a limit less than 1");
-//			}
 		}
 
 		int size = Integer.parseInt(tokens[1]);
 		if(size == 1){
-			throw new IllegalStateException("Exploding dice may not have a die size of 1");
+			return new DieResult("Exploding dice may not have a die size of 1");
 		}
 		int total = 0;
 		while (times == null || times >= 0){
@@ -178,18 +184,21 @@ public class DieParser {
 			}
 		}
 
-		return total;
+		return new DieResult(total, join(" + ", steps.toArray(new String[0])), "");
 	}
 
-	private int parseDieExpression(String value, int subtract) {
+	private static DieResult parseDieExpression(String value, int subtract) {
+		List<String> steps = new ArrayList<>();
 		String[] tokens = value.split("d");
 		int times = tokens[0].isBlank()? 1 : Integer.parseInt(tokens[0]);
 		int size = Integer.parseInt(tokens[1]);
-		return IntStream.range(0, times).map(i -> {
+		int sum = IntStream.range(0, times).map(i -> {
 					int roll = (RAND.nextInt(size) + 1) * subtract;
-					steps.add(""+roll);
+					steps.add("" + roll);
 					return roll;
 				}
 		).reduce(0, Integer::sum);
+
+		return new DieResult(sum, join(" + ", steps.toArray(new String[0])), "");
 	}
 }
