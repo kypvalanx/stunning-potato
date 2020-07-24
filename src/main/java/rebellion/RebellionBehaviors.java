@@ -1,41 +1,41 @@
 package rebellion;
 
 import behavior.Behavior;
+import behavior.ChannelHelper;
+import behavior.GroupBehavior;
 import behavior.NachoHelpBehavior;
 import core.CheckDC;
 import core.DeckList;
 import core.DieParser;
 import core.DieResult;
 import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
+import rebellion.events.RebellionEvent;
 
 public class RebellionBehaviors {
-	private final Behavior followUpBehavior;
-	private Rebellion currentRebellion;
-
-	public RebellionBehaviors(Rebellion currentRebellion, Behavior followUpBehavior) {
-		this.currentRebellion = currentRebellion;
-		this.followUpBehavior = followUpBehavior;
-	}
-
-	public void setCurrentRebellion(Rebellion currentRebellion) {
-		this.currentRebellion = currentRebellion;
-	}
+	private static final Behavior FOLLOW_UP_BEHAVIOR = new Behavior() {
+		@Override
+		public void run(DeckList<String> message, MessageChannel channel) {
+			Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
+			RebellionDelegate.writeOutRebellionToFile(currentRebellion);
+		}
+	};
 
 
-
-	public Behavior getSupportersBehavior() {
+	public static Behavior getSupportersBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				if(message.canDraw()){
 
 					currentRebellion.addSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 				}
 
 				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -46,72 +46,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSubSupportersBehavior() {
+	public static Behavior getSubMembersBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-
-				currentRebellion.addSupporters(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-
-				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
-				followUpBehavior.run(message, channel);
-			}
-
-			@Override
-			public List<String> getFormattedHelp(DeckList<String> s, String key) {
-				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from supporters, accepts a die roll equation"));
-			}
-		};
-	}
-
-	@NotNull
-	public Behavior getAddSupportersBehavior() {
-		return new Behavior() {
-			@Override
-			public void run(DeckList<String> message, MessageChannel channel) {
-
-				currentRebellion.addSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-
-				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
-				followUpBehavior.run(message, channel);
-			}
-			@Override
-			public List<String> getFormattedHelp(DeckList<String> s, String key) {
-				return List.of(NachoHelpBehavior.formatHelp(key,"adds to supporters, accepts a die roll equation"));
-			}
-		};
-	}
-
-	@NotNull
-	public Behavior getSetSupportersBehavior() {
-		return new Behavior() {
-			@Override
-			public void run(DeckList<String> message, MessageChannel channel) {
-
-				currentRebellion.setSupporters(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-
-				channel.sendMessage("Current Supporters " + currentRebellion.getSupporters()).queue();
-				followUpBehavior.run(message, channel);
-			}
-
-			@Override
-			public List<String> getFormattedHelp(DeckList<String> s, String key) {
-				return List.of(NachoHelpBehavior.formatHelp(key,"sets supporters, accepts a die roll equation"));
-			}
-		};
-	}
-
-
-	@NotNull
-	public Behavior getSubMembersBehavior() {
-		return new Behavior() {
-			@Override
-			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addMembers(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
-				channel.sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(message, channel);
+				channel.sendMessage("Current Members " + currentRebellion.getMembers()).queue();
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -122,15 +66,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getAddMembersBehavior() {
+	public static Behavior getAddMembersBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addMembers(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
-				channel.sendMessage("Current Members " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(message, channel);
+				channel.sendMessage("Current Members " + currentRebellion.getMembers()).queue();
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -141,15 +86,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSubNotorietyBehavior() {
+	public static Behavior getSubNotorietyBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addNotoriety(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -160,15 +106,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getAddNotorietyBehavior() {
+	public static Behavior getAddNotorietyBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addNotoriety(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Notoriety " + currentRebellion.getNotoriety()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -179,15 +126,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSubPopulationBehavior() {
+	public static Behavior getSubPopulationBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addPopulation(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -198,15 +146,16 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getAddPopulationBehavior() {
+	public static Behavior getAddPopulationBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.addPopulation(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 
 				channel.sendMessage("Current Population " + currentRebellion.getPopulation()).queue();
-				followUpBehavior.run( message, channel);
+				FOLLOW_UP_BEHAVIOR.run( message, channel);
 			}
 
 			@Override
@@ -216,17 +165,18 @@ public class RebellionBehaviors {
 		};
 	}
 
-	public Behavior getTreasuryBehavior() {
+	public static Behavior getTreasuryBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				if(message.canDraw()){
 
 					currentRebellion.addTreasury(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
 				}
 
 				channel.sendMessage("Treasury " + currentRebellion.getTreasury()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -237,51 +187,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSubTreasuryBehavior() {
+	public static Behavior getSetStrategistBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-
-				currentRebellion.addTreasury(-DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-
-				channel.sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
-				followUpBehavior.run(message, channel);
-			}
-
-			@Override
-			public List<String> getFormattedHelp(DeckList<String> s, String key) {
-				return List.of(NachoHelpBehavior.formatHelp(key,"subtracts from treasury, accepts a die roll equation"));
-			}
-		};
-	}
-
-	@NotNull
-	public Behavior getAddTreasuryBehavior() {
-		return new Behavior() {
-			@Override
-			public void run(DeckList<String> message, MessageChannel channel) {
-
-				currentRebellion.addTreasury(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-
-				channel.sendMessage("Current Treasury " + currentRebellion.getTreasury()).queue();
-				followUpBehavior.run(message, channel);
-			}
-
-			@Override
-			public List<String> getFormattedHelp(DeckList<String> s, String key) {
-				return List.of(NachoHelpBehavior.formatHelp(key,"adds to treasury, accepts a die roll equation"));
-			}
-		};
-	}
-
-	@NotNull
-	public Behavior getSetStrategistBehavior() {
-		return new Behavior() {
-			@Override
-			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setStrategist(message.getDeck());
 				channel.sendMessage("Strategist Available: " + currentRebellion.isHasStrategist()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -292,13 +205,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetSpymasterBehavior() {
+	public static Behavior getSetSpymasterBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setSpyMaster(message.getDeck());
 				channel.sendMessage("Spymaster Dex/Int Set: " + currentRebellion.getSpymasterSecrecyBonus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -309,13 +223,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetSentinelBehavior() {
+	public static Behavior getSetSentinelBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setSentinal(message.getDeck());
 				channel.sendMessage("Sentinel Con/Cha, Str/Wis, Dex/Int Set: " + currentRebellion.getSentinelLoyaltyBonus() + ", " + currentRebellion.getSentinelSecurityBonus() + ", " + currentRebellion.getSentinelSecrecyBonus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -326,13 +241,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetRecruiterBehavior() {
+	public static Behavior getSetRecruiterBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setRecruiter(Integer.parseInt(message.getDeck().get(0)));
 				channel.sendMessage("Recruiter Level Set: " + currentRebellion.getRecruiterLvlBonus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -343,13 +259,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetPartisanBehavior() {
+	public static Behavior getSetPartisanBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setPartisan(message.getDeck());
 				channel.sendMessage("Partisan Str/Wis Set: " + currentRebellion.getPartisanSecurityBonus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -360,13 +277,14 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetDemagogueBehavior() {
+	public static Behavior getSetDemagogueBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				currentRebellion.setDemagogue(message.getDeck());
 				channel.sendMessage("Demagogue Con/Cha Set: " + currentRebellion.getDemagogueLoyaltyBonus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -377,14 +295,15 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetSkillFocusBehavior() {
+	public static Behavior getSetSkillFocusBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				Focus focus = Focus.valueOf(String.join(" ", message.getDeck()).toUpperCase());
 				currentRebellion.setFocus(focus);
 				channel.sendMessage("Focus Set: " + currentRebellion.getFocus()).queue();
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -395,14 +314,15 @@ public class RebellionBehaviors {
 	}
 
 	@NotNull
-	public Behavior getSetMaxRankBehavior() {
+	public static Behavior getSetMaxRankBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 
 				currentRebellion.setMaxRank(DieParser.rollDiceGroups(String.join(" ", message.getDeck())).get(0).getSum());
-				channel.sendMessage("Max Level Set: " + currentRebellion.getRebellionMaxLevel()).queue();
-				followUpBehavior.run(message, channel);
+				channel.sendMessage("Max Level Set: " + currentRebellion.getMaxLevel()).queue();
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -412,12 +332,13 @@ public class RebellionBehaviors {
 		};
 	}
 
-	public Behavior getRollLoyaltyBehavior() {
+	public static Behavior getRollLoyaltyBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				rollCheck(message, currentRebellion.getLoyaltyBonus(), channel);
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -427,12 +348,13 @@ public class RebellionBehaviors {
 		};
 	}
 
-	public Behavior getRollSecrecyBehavior() {
+	public static Behavior getRollSecrecyBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				rollCheck(message, currentRebellion.getSecrecyBonus(), channel);
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -442,12 +364,13 @@ public class RebellionBehaviors {
 		};
 	}
 
-	public Behavior getRollSecurityBehavior() {
+	public static Behavior getRollSecurityBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
+				Rebellion currentRebellion = RebellionDelegate.getCurrentRebellion(channel.getId());
 				rollCheck(message, currentRebellion.getSecurityBonus(), channel);
-				followUpBehavior.run(message, channel);
+				FOLLOW_UP_BEHAVIOR.run(message, channel);
 			}
 
 			@Override
@@ -460,7 +383,7 @@ public class RebellionBehaviors {
 
 
 
-	private void rollCheck(DeckList<String> message, int bonus, MessageChannel channel) {
+	private static void rollCheck(DeckList<String> message, int bonus, MessageChannel channel) {
 		DieResult dieResult;
 		if (!message.canDraw()) {
 
@@ -472,5 +395,91 @@ public class RebellionBehaviors {
 		channel.sendMessage(" " + dieResult.getSum()).queue();
 		channel.sendMessage(" " + dieResult.getSteps()).queue();
 		CheckDC.attemptCheck(dieResult.getSum(), channel);
+	}
+
+	@NotNull
+	public static Behavior getPrintsTheRebellionSheetBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(DeckList<String> message, MessageChannel channel) {
+				if (!message.canDraw()) {
+					channel.sendMessage(RebellionDelegate.getCurrentRebellion(channel.getId()).getSheet()).queue();
+				}
+			}
+
+			@Override
+			public List<String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key, "prints the rebellion sheet"));
+			}
+		};
+	}
+
+	public static GroupBehavior getRebellionBehavior() {
+		return new GroupBehavior()
+				.setDefault(getPrintsTheRebellionSheetBehavior())
+				.add(getSupportersBehavior(), "supporters")
+				.add(getTreasuryBehavior(), "treasury")
+				.add(getAddPopulationBehavior(), "population add", "pop add")
+				.add(getSubPopulationBehavior(), "population sub", "population subtract", "pop sub", "pop subtract")
+				.add(getAddNotorietyBehavior(), "notoriety add")
+				.add(getSubNotorietyBehavior(), "notoriety subtract", "notoriety sub")
+				.add(getAddMembersBehavior(), "members add")
+				.add(getSubMembersBehavior(), "members sub", "members subtract")
+				.add(getSetMaxRankBehavior(), "max rank set", "max level set")
+				.add(getSetSkillFocusBehavior(), "focus")
+				.add(getSetDemagogueBehavior(), "demagogue")
+				.add(getSetPartisanBehavior(), "partisan")
+				.add(getSetRecruiterBehavior(), "recruiter")
+				.add(getSetSentinelBehavior(), "sentinel")
+				.add(getSetSpymasterBehavior(), "spymaster")
+				.add(getSetStrategistBehavior(), "strategist")
+				.add(getRollLoyaltyBehavior(), "roll loyalty", "loyalty")
+				.add(getRollSecrecyBehavior(), "roll secrecy", "secrecy")
+				.add(getRollSecurityBehavior(), "roll security", "security")
+				.add(RebellionEvent.getEventBehavior(), "event")
+				.add(getListBehavior(), "list")
+				.add(getSetBehavior(), "set");
+	}
+
+	private static Behavior getSetBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(DeckList<String> message, MessageChannel channel) {
+				if (message.canDraw()) {
+					try {
+						long id = Long.parseLong(message.draw());
+						new RebellionDelegate().setMapping(channel.getId(), id);
+						channel.sendMessage("This Channel now using rebellion: "+id).queue();
+					}catch (NumberFormatException e){
+						channel.sendMessage("rebellion ids are numbers").queue();
+					}
+				}
+			}
+
+			@Override
+			public List<@NotNull String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key, "allows you to set what rebellion the current channel is mapped to"));
+			}
+		};
+	}
+
+	private static Behavior getListBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(DeckList<String> message, MessageChannel channel) {
+				Map<String, Long> mappings = new RebellionDelegate().getMappings();
+				String steps = "Current Mappings ("+channel.getId()+"):\n";
+				for(Map.Entry<String, Long> mapping : mappings.entrySet()){
+					steps = steps.concat(mapping.getKey() + " : " + mapping.getValue() + "\n");
+				}
+
+				ChannelHelper.sendLongMessage("\n", steps, channel);
+			}
+
+			@Override
+			public List<@NotNull String> getFormattedHelp(DeckList<String> s, String key) {
+				return List.of(NachoHelpBehavior.formatHelp(key, "Lists Channel mappings to rebellions"));
+			}
+		};
 	}
 }

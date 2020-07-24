@@ -4,3 +4,4 @@
 resources/config
 resources/generated
 resources/save
+resources/db/

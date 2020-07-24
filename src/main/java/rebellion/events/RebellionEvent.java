@@ -6,6 +6,7 @@ import core.DieParser;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import rebellion.Rebellion;
+import rebellion.RebellionDelegate;
 
 public interface RebellionEvent {
 	RebellionEvent WEEK_OF_SECRECY = new RebellionEvent() {
@@ -568,11 +569,11 @@ public interface RebellionEvent {
 	}
 
 	@NotNull
-	static Behavior getEventBehavior(Rebellion rebellion) {
+	static Behavior getEventBehavior() {
 		return new Behavior() {
 			@Override
 			public void run(DeckList<String> message, MessageChannel channel) {
-				int eventNumber = getEventNumber(message, rebellion);
+				int eventNumber = getEventNumber(message, RebellionDelegate.getCurrentRebellion(channel.getId()));
 				RebellionEvent rebellionEvent = RebellionEvent.getEvent(eventNumber);
 				channel.sendMessage("{" + eventNumber + "}").queue();
 				channel.sendMessage(rebellionEvent.getDescription()).queue();

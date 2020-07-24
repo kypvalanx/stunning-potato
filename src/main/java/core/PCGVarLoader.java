@@ -163,7 +163,8 @@ public class PCGVarLoader {
             Element skill = (Element) skills.item(i);
 
             String key = skill.getElementsByTagName(name2).item(0).getTextContent().toLowerCase();
-            String value = s + Integer.parseInt(skill.getElementsByTagName(skill_mod).item(0).getTextContent());
+            // TODO ADD ROLL LABEL
+            String value = "`"+key+"\n"+s + Integer.parseInt(skill.getElementsByTagName(skill_mod).item(0).getTextContent());
             vars.put(key, value);
         }
     }

@@ -1,5 +1,8 @@
 package core;
 
+import behavior.Behavior;
+import behavior.ChannelHelper;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 
 public class DieParser {
@@ -200,5 +204,32 @@ public class DieParser {
 		).reduce(0, Integer::sum);
 
 		return new DieResult(sum, join(" + ", steps.toArray(new String[0])), "");
+	}
+
+	@NotNull
+	public static Behavior getRollBehavior() {
+		return new Behavior() {
+			@Override
+			public void run(DeckList<String> message, MessageChannel channel) {
+				List<DieResult> dieResults = rollDiceGroups(message);
+				List<String> messages = Lists.newArrayList();
+				for (DieResult dieResult : dieResults) {
+					if (dieResult.getSteps() == null) {
+						messages.add(dieResult.getMessage());
+					} else {
+						messages.add(Context.getCaller().getAsMention() + " rolls " + dieResult.getMessage());
+						messages.add("" + dieResult.getSum());
+						messages.add(dieResult.getSteps());
+						CheckDC.attemptCheck(dieResult.getSum(), channel);
+					}
+				}
+				ChannelHelper.sendLongMessage(" ", String.join("\n", messages), channel);
+			}
+
+			@Override
+			public String getHelp(DeckList<String> s, String key) {
+				return "Rolls whatever is provided after it.  use the format [XdY + Z] where X is the number of dice to be rolled, Y is the number of sides, and Z is a flat bonus.  Separate all terms with a + or -.  Variables from the var command will be resolved if possible. Separate rolls can be separated with and.  die eqs precided by an ' will be printed back without resolving.";
+			}
+		};
 	}
 }

@@ -1,23 +1,23 @@
 package rebellion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import java.io.File;
-import java.io.IOException;
+import com.google.common.base.Objects;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class Rebellion {
-	private static final String DEFAULT_RESOURCE_FILE = "resources/save/rebellion.yaml";
 
-    private String rebellionName = "Kintargo";
+public class Rebellion {
+
+	private long id=-1;
+    private String name = "Kintargo";
 	private int supporters = 0;
     private int treasury = 0;
     private int population = 0;
     private int notoriety;
-    private int rebellionMaxLevel;
+    private int maxLevel;
     private int members;
     private int dangerRating = 20;
     private Focus focus = Focus.NONE;
@@ -30,41 +30,41 @@ public class Rebellion {
     private int spymasterSecrecyBonus;
     private boolean hasStrategist;
 
-	@NotNull
-	public static Rebellion getRebellionFromFile() {
-		File rebellionFile = new File(DEFAULT_RESOURCE_FILE);
-		if (rebellionFile.canRead()) {
+    public Rebellion(ResultSet resultSet) {
+try {
+    int i = 1;
+    id = resultSet.getInt(i++);
+    name = resultSet.getString(i++);
+    supporters = resultSet.getInt(i++);
+            treasury = resultSet.getInt(i++);
+            population = resultSet.getInt(i++);
+            notoriety = resultSet.getInt(i++);
+            maxLevel = resultSet.getInt(i++);
+            members = resultSet.getInt(i++);
+            dangerRating = resultSet.getInt(i++);
+            focus = Focus.valueOf(resultSet.getString(i++));
+            demagogueLoyaltyBonus = resultSet.getInt(i++);
+            partisanSecurityBonus = resultSet.getInt(i++);
+            recruiterLvlBonus = resultSet.getInt(i++);
+            sentinelLoyaltyBonus = resultSet.getInt(i++);
+            sentinelSecurityBonus = resultSet.getInt(i++);
+            sentinelSecrecyBonus = resultSet.getInt(i++);
+            spymasterSecrecyBonus = resultSet.getInt(i++);
+            hasStrategist = resultSet.getBoolean(i++);
 
-			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+} catch (SQLException e){
+    e.printStackTrace();
+}
+    }
 
-			try {
-				return mapper.readValue(rebellionFile, Rebellion.class);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return new Rebellion();
-	}
+    public Rebellion() {
 
-	public static void writeOutRebellionToFile(Rebellion rebellion){
-		new File("resources/save/").mkdir();
-		File rebellionFile = new File(DEFAULT_RESOURCE_FILE);
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
-		try {
-			if(!rebellionFile.createNewFile()){
-				rebellionFile.delete();
-				rebellionFile.createNewFile();
-			}
-			mapper.writeValue(rebellionFile, rebellion);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    }
 
-	@JsonIgnore
+    @JsonIgnore
     public String getSheet() {
         return "Rebellion Rank: " + getRebellionRank() + "\n" +
-                "Rebellion Max Level: " + getRebellionMaxLevel() + "\n" +
+                "Rebellion Max Level: " + getMaxLevel() + "\n" +
                 "Rebellion Members: " + getMembers() + "\n" +
                 "Rebellion Supporters: " + getSupporters() + "\n" +
                 getRebellion() + " Population: " + getPopulation() + "\n" +
@@ -114,6 +114,7 @@ public class Rebellion {
     public void setRecruiter(int level){
         recruiterLvlBonus = level;
     }
+
     public void setSentinal(List<String> attributes){
         if(attributes.isEmpty()){
             sentinelLoyaltyBonus = 0;
@@ -131,6 +132,7 @@ public class Rebellion {
             throw new IllegalArgumentException("Illegal list length: 0,3,6");
         }
     }
+
     public void setSpyMaster(List<String> attributes){
         if(attributes.isEmpty()){
             spymasterSecrecyBonus = 0;
@@ -238,14 +240,14 @@ public class Rebellion {
         return treasury;
     }
 
-    public void setRebellionName(String rebellionName){
-        this.rebellionName = rebellionName;
+    public void setName(String name){
+        this.name = name;
     }
 
     @NotNull
     @JsonIgnore
     public String getRebellion() {
-        return rebellionName;
+        return name;
     }
 
     public int getPopulation() {
@@ -260,14 +262,14 @@ public class Rebellion {
         return members;
     }
 
-    public int getRebellionMaxLevel() {
-        return rebellionMaxLevel;
+    public int getMaxLevel() {
+        return maxLevel;
     }
 
     @JsonIgnore
     public int getRebellionRank() {
         int supporters = getSupporters();
-        return Math.min(_getRank(supporters),rebellionMaxLevel);
+        return Math.min(_getRank(supporters), maxLevel);
     }
 
     private int _getRank(int supporters) {
@@ -339,7 +341,7 @@ public class Rebellion {
     }
 
     public void setMaxRank(int maxRank) {
-        this.rebellionMaxLevel = maxRank;
+        this.maxLevel = maxRank;
     }
 
     public int getDemagogueLoyaltyBonus() {
@@ -372,5 +374,89 @@ public class Rebellion {
 
     public boolean isHasStrategist() {
         return hasStrategist;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void prepare(PreparedStatement statement) throws SQLException {
+        int i = 1;
+        statement.setString(i++, name);
+        statement.setInt(i++, supporters);
+        statement.setInt(i++, treasury);
+        statement.setInt(i++, population);
+        statement.setInt(i++, notoriety);
+        statement.setInt(i++, maxLevel);
+        statement.setInt(i++, members);
+        statement.setInt(i++, dangerRating);
+        statement.setString(i++, focus.name());
+        statement.setInt(i++, demagogueLoyaltyBonus);
+        statement.setInt(i++, partisanSecurityBonus);
+        statement.setInt(i++, recruiterLvlBonus);
+        statement.setInt(i++, sentinelLoyaltyBonus);
+        statement.setInt(i++, sentinelSecurityBonus);
+        statement.setInt(i++, sentinelSecrecyBonus);
+        statement.setInt(i++, spymasterSecrecyBonus);
+        statement.setBoolean(i++, hasStrategist);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rebellion rebellion = (Rebellion) o;
+        return id == rebellion.id &&
+                supporters == rebellion.supporters &&
+                treasury == rebellion.treasury &&
+                population == rebellion.population &&
+                notoriety == rebellion.notoriety &&
+                maxLevel == rebellion.maxLevel &&
+                members == rebellion.members &&
+                dangerRating == rebellion.dangerRating &&
+                demagogueLoyaltyBonus == rebellion.demagogueLoyaltyBonus &&
+                partisanSecurityBonus == rebellion.partisanSecurityBonus &&
+                recruiterLvlBonus == rebellion.recruiterLvlBonus &&
+                sentinelLoyaltyBonus == rebellion.sentinelLoyaltyBonus &&
+                sentinelSecurityBonus == rebellion.sentinelSecurityBonus &&
+                sentinelSecrecyBonus == rebellion.sentinelSecrecyBonus &&
+                spymasterSecrecyBonus == rebellion.spymasterSecrecyBonus &&
+                hasStrategist == rebellion.hasStrategist &&
+                Objects.equal(name, rebellion.name) &&
+                focus == rebellion.focus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, name, supporters, treasury, population, notoriety, maxLevel, members, dangerRating, focus, demagogueLoyaltyBonus, partisanSecurityBonus, recruiterLvlBonus, sentinelLoyaltyBonus, sentinelSecurityBonus, sentinelSecrecyBonus, spymasterSecrecyBonus, hasStrategist);
+    }
+
+    @Override
+    public String toString() {
+        return "Rebellion{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", supporters=" + supporters +
+                ", treasury=" + treasury +
+                ", population=" + population +
+                ", notoriety=" + notoriety +
+                ", maxLevel=" + maxLevel +
+                ", members=" + members +
+                ", dangerRating=" + dangerRating +
+                ", focus=" + focus +
+                ", demagogueLoyaltyBonus=" + demagogueLoyaltyBonus +
+                ", partisanSecurityBonus=" + partisanSecurityBonus +
+                ", recruiterLvlBonus=" + recruiterLvlBonus +
+                ", sentinelLoyaltyBonus=" + sentinelLoyaltyBonus +
+                ", sentinelSecurityBonus=" + sentinelSecurityBonus +
+                ", sentinelSecrecyBonus=" + sentinelSecrecyBonus +
+                ", spymasterSecrecyBonus=" + spymasterSecrecyBonus +
+                ", hasStrategist=" + hasStrategist +
+                '}';
     }
 }
