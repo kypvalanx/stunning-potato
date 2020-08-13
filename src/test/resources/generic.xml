@@ -160,10 +160,10 @@
 			</move>
 			<all>Walk 30 ft.</all>
 		</move>
-		<personality>
+		<org.gary.personality>
 			<trait></trait>
 			<trait></trait>
-		</personality>
+		</org.gary.personality>
 		<portrait>
 			<portrait></portrait>
 			<portrait_thumb></portrait_thumb>
@@ -209,12 +209,12 @@
 
 			<note>
 				<name>Session 3</name>
-				<value><para>gnomes are racist assholes</para><para></para><para>temple of the wanderer</para><para>Mylin is the cleric (possibly evil necromancer)</para><para>-has statues of pharasma</para><para></para><para>torpinal available at temple</para><para></para><para></para><para>went to tempting tonics --&gt;justine imiaron</para><para></para><para>gant gained fast healing 5 from the numerian liquid</para><para></para><para>tempting tonics inventory:</para><para>cardio-amp</para><para>cure light</para><para>mage armor</para><para>star spore dc 15 fort darkvision and invisible creatures</para><para>blood root </para><para>blood brush DC 14 fort per round wis dam and dazed</para><para></para><para>went to Dolga to get the tag translated --&gt; says &quot;pet&quot;</para><para></para><para></para><para></para><para>2 shocking grasp</para><para>detect magic</para><para>ray of frost</para><para>light</para></value>
+				<value><para>gnomes are racist assholes</para><para></para><para>temple of the wanderer</para><para>Mylin is the cleric (possibly evil necromancer)</para><para>-has statues of pharasma</para><para></para><para>torpinal available at temple</para><para></para><para></para><para>went to tempting tonics --&gt;justine imiaron</para><para></para><para>gant gained fast healing 5 from the numerian liquid</para><para></para><para>tempting tonics inventory:</para><para>cardio-amp</para><para>cure light</para><para>mage org.gary.armor</para><para>star spore dc 15 fort darkvision and invisible creatures</para><para>blood root </para><para>blood brush DC 14 fort per round wis dam and dazed</para><para></para><para>went to Dolga to get the tag translated --&gt; says &quot;pet&quot;</para><para></para><para></para><para></para><para>2 shocking grasp</para><para>detect magic</para><para>ray of frost</para><para>light</para></value>
 			</note>
 
 			<note>
 				<name>Session 4</name>
-				<value><para>talked to seph.  she wants us to kill gremlins.</para><para></para><para>yardris is a badass, </para><para></para><para>killed gremlins</para><para>found impassable door</para><para></para><para>brown mold found killed by ray of cold</para><para></para><para></para><para>russet mold infected Gerrol&#8217;s body</para><para></para><para>Gerrol&#39;s Bethrothed promised us masterwork weapons</para><para></para><para>made it back to town</para></value>
+				<value><para>talked to seph.  she wants us to kill gremlins.</para><para></para><para>yardris is a badass, </para><para></para><para>killed gremlins</para><para>found impassable door</para><para></para><para>brown mold found killed by ray of cold</para><para></para><para></para><para>russet mold infected Gerrol&#8217;s body</para><para></para><para>Gerrol&#39;s Bethrothed promised us masterwork org.gary.weapons</para><para></para><para>made it back to town</para></value>
 			</note>
 
 			<note>
@@ -1202,7 +1202,7 @@
 	  ====================================
 	  ====================================-->
 
-	<weapons>
+	<org.gary.weapons>
 		<unarmed>
 			<total>+4</total>
 			<damage>1d3</damage>
@@ -1297,17 +1297,17 @@
 					<damage>1d6+5</damage>
 				</w1_h2>
 				<w2_p_oh>
-					<!-- Two weapons, this weapon in primary hand, other hand with heavy weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with heavy weapon -->
 					<to_hit>+4</to_hit>
 					<damage>1d6+5</damage>
 				</w2_p_oh>
 				<w2_p_ol>
-					<!-- Two weapons, this weapon in primary hand, other hand with light weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with light weapon -->
 					<to_hit>+6</to_hit>
 					<damage>1d6+5</damage>
 				</w2_p_ol>
 				<w2_o>
-					<!-- Two weapons, this weapon in off-hand -->
+					<!-- Two org.gary.weapons, this weapon in off-hand -->
 					<to_hit>+0</to_hit>
 					<damage>1d6+5</damage>
 				</w2_o>
@@ -1388,17 +1388,17 @@
 					<damage>1d4+1</damage>
 				</w1_h2>
 				<w2_p_oh>
-					<!-- Two weapons, this weapon in primary hand, other hand with heavy weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with heavy weapon -->
 					<to_hit>-1</to_hit>
 					<damage>1d4+1</damage>
 				</w2_p_oh>
 				<w2_p_ol>
-					<!-- Two weapons, this weapon in primary hand, other hand with light weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with light weapon -->
 					<to_hit>+1</to_hit>
 					<damage>1d4+1</damage>
 				</w2_p_ol>
 				<w2_o>
-					<!-- Two weapons, this weapon in off-hand -->
+					<!-- Two org.gary.weapons, this weapon in off-hand -->
 					<to_hit>-3</to_hit>
 					<damage>1d4+1</damage>
 				</w2_o>
@@ -1551,17 +1551,17 @@
 					<damage>1d4</damage>
 				</w1_h2>
 				<w2_p_oh>
-					<!-- Two weapons, this weapon in primary hand, other hand with heavy weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with heavy weapon -->
 					<to_hit>-2</to_hit>
 					<damage>1d4</damage>
 				</w2_p_oh>
 				<w2_p_ol>
-					<!-- Two weapons, this weapon in primary hand, other hand with light weapon -->
+					<!-- Two org.gary.weapons, this weapon in primary hand, other hand with light weapon -->
 					<to_hit>+0</to_hit>
 					<damage>1d4</damage>
 				</w2_p_ol>
 				<w2_o>
-					<!-- Two weapons, this weapon in off-hand -->
+					<!-- Two org.gary.weapons, this weapon in off-hand -->
 					<to_hit>-4</to_hit>
 					<damage>1d4</damage>
 				</w2_o>
@@ -1639,7 +1639,7 @@
 			</ranges>
 		</weapon>
 	<!-- End New Ranges Section -->
-	</weapons>
+	</org.gary.weapons>
 	<!--
 	  ====================================
 	  ====================================
@@ -1647,7 +1647,7 @@
 	  ====================================
 	  ====================================-->
 	<protection>
-		<armor>
+		<org.gary.armor>
 			<name>*+1 Mithral Shirt</name>
 			<acbonus>+5</acbonus>
 			<accheck>+0</accheck>
@@ -1662,7 +1662,7 @@
 			<wt>10</wt>
 			<fulltype>MAGIC.ARMOR.LIGHT.ARMORPROFLIGHT.SUIT.LESSERMINOR.CUSTOM.METAL.MITHRAL.MASTERWORK.ARMORENHANCEMENT.PLUS1</fulltype>
 			<location>Equipped</location>
-		</armor>
+		</org.gary.armor>
 	</protection>
 	<!--
 	  ====================================
@@ -2339,7 +2339,7 @@
 		<feat>
 			<name>Fencing Grace</name>
 			<description>Your dashing style and fluid rapier forms allow you to use agility rather than brute force to fell your foes.</description>
-			<benefit>When wielding a rapier one-handed, you can add your Dexterity modifier instead of your Strength modifier to that weapon&#39;s damage. The rapier must be one appropriate for your size. You do not gain this benefit while fighting with two weapons or using flurry of blows, or anytime another hand is otherwise occupied. In addition, if you have the panache class feature, you gain a +2 bonus to your CMD against attempts to disarm you of your rapier while you have at least 1 panache point.</benefit>
+			<benefit>When wielding a rapier one-handed, you can add your Dexterity modifier instead of your Strength modifier to that weapon&#39;s damage. The rapier must be one appropriate for your size. You do not gain this benefit while fighting with two org.gary.weapons or using flurry of blows, or anytime another hand is otherwise occupied. In addition, if you have the panache class feature, you gain a +2 bonus to your CMD against attempts to disarm you of your rapier while you have at least 1 panache point.</benefit>
 			<type>COMBAT</type>
 			<associated></associated>
 			<count>0</count>
@@ -2415,7 +2415,7 @@
 	<archetypes>
 		<archetype>
 			<name>Inspired Blade</name>
-			<description>An inspired blade is both a force of personality and a sage of swordplay dedicated to the perfection of combat with the rapier. They use the science and geometry with swordplay to beautiful and deadly effect.</description>
+			<description>An inspired blade is both a force of org.gary.personality and a sage of swordplay dedicated to the perfection of combat with the rapier. They use the science and geometry with swordplay to beautiful and deadly effect.</description>
 			<type>ARCHETYPE.SWASHBUCKLERARCHETYPE.SWASHBUCKLERBLEEDINGWOUNDDEED.SWASHBUCKLERPANACHE.SWASHBUCKLERFINESSE.SWASHBUCKLERWEAPONTRAINING.SWASHBUCKLERWEAPONMASTERY</type>
 			<associated></associated>
 			<count>0</count>
@@ -2472,7 +2472,7 @@
 		</special_quality>
 		<special_quality>
 			<name>Armor Proficiency (Ex)</name>
-			<description>You can cast magus spells while wearing light armor without incurring the normal arcane spell failure chance. Like any other arcane spellcaster, a magus wearing medium armor, heavy armor, or a shield incurs a chance of arcane spell failure if the spell in question has a somatic component. A multiclass magus still incurs the normal arcane spell failure chance for arcane spells received from other classes.</description>
+			<description>You can cast magus spells while wearing light org.gary.armor without incurring the normal arcane spell failure chance. Like any other arcane spellcaster, a magus wearing medium org.gary.armor, heavy org.gary.armor, or a shield incurs a chance of arcane spell failure if the spell in question has a somatic component. A multiclass magus still incurs the normal arcane spell failure chance for arcane spells received from other classes.</description>
 			<type>MAGUSCLASSFEATURES.SPECIALQUALITY.EXTRAORDINARY</type>
 			<associated></associated>
 			<count>0</count>
@@ -2524,7 +2524,7 @@
 		</special_quality>
 		<special_quality>
 			<name>Dodging Panache (Ex)</name>
-			<description>At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#39;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor, and while carrying no heavier than a light load. This deed&#39;s cost cannot be reduced by any ability or effect that reduces the number of panache points a deed costs.</description>
+			<description>At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#39;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no org.gary.armor, and while carrying no heavier than a light load. This deed&#39;s cost cannot be reduced by any ability or effect that reduces the number of panache points a deed costs.</description>
 			<type>SPECIALQUALITY.SWASHBUCKLER DEED.SWASHBUCKLERDEEDSLVL1.DEEDSHASPANACHECOST.EXTRAORDINARY</type>
 			<associated></associated>
 			<count>0</count>
@@ -2550,7 +2550,7 @@
 		</special_quality>
 		<special_quality>
 			<name>Constructed</name>
-			<description>For the purposes of effects targeting creatures by type (such as a ranger&#39;s favored enemy and bane weapons), androids count as both humanoids and constructs. Androids gain a +4 racial bonus on all saving throws against  mind-affecting effects,  paralysis, poison, and stun effects, are not subject to fatigue or exhaustion, and are immune to disease and sleep effects. Androids  can never gain morale bonuses, and are immune to fear effects and all emotion-based effects.</description>
+			<description>For the purposes of effects targeting creatures by type (such as a ranger&#39;s favored enemy and bane org.gary.weapons), androids count as both humanoids and constructs. Androids gain a +4 racial bonus on all saving throws against  mind-affecting effects,  paralysis, poison, and stun effects, are not subject to fatigue or exhaustion, and are immune to disease and sleep effects. Androids  can never gain morale bonuses, and are immune to fear effects and all emotion-based effects.</description>
 			<type>ANDROID RACIAL TRAIT.SPECIALQUALITY</type>
 			<associated></associated>
 			<count>0</count>
@@ -2680,7 +2680,7 @@
 		</special_quality>
 		<special_quality>
 			<name>Weapon and Armor Proficiency</name>
-			<description>Swashbucklers are proficient with simple and martial weapons, as well as light armor and bucklers.</description>
+			<description>Swashbucklers are proficient with simple and martial org.gary.weapons, as well as light org.gary.armor and bucklers.</description>
 			<type>SWASHBUCKLER CLASS FEATURE.SPECIALQUALITY</type>
 			<associated></associated>
 			<count>0</count>
@@ -2702,7 +2702,7 @@
 		<!-- Visible All "Special Ability" Ability Objects -->
 		<special_attack>
 			<name>Spell Combat (Ex)</name>
-			<description>You can cast spells and wield your weapons at the same time. This functions much like two-weapon fighting, but the offhand weapon is a spell that is being cast. To use this ability, you must have one hand free (even if the spell being cast does not have somatic components), while wielding a light or one-handed melee weapon in the other hand. As a full-round action, you can make all of your attacks with your melee weapon at a -2 penalty and can also cast any spell from the magus spell list with a casting time of 1 standard action  (any attack roll made as part of this spell also takes this penalty). If you cast this spell defensively, you can decide to take an additional penalty on your attack rolls, up to your Intelligence bonus, and add the same amount as a circumstance bonus on your concentration check. If the check fails, the spell is wasted, but the attacks still take the penalty. You can choose to cast the spell first or make the weapon attacks first, but if you have more than one attack, you cannot cast the spell between weapon attacks.</description>
+			<description>You can cast spells and wield your org.gary.weapons at the same time. This functions much like two-weapon fighting, but the offhand weapon is a spell that is being cast. To use this ability, you must have one hand free (even if the spell being cast does not have somatic components), while wielding a light or one-handed melee weapon in the other hand. As a full-round action, you can make all of your attacks with your melee weapon at a -2 penalty and can also cast any spell from the magus spell list with a casting time of 1 standard action  (any attack roll made as part of this spell also takes this penalty). If you cast this spell defensively, you can decide to take an additional penalty on your attack rolls, up to your Intelligence bonus, and add the same amount as a circumstance bonus on your concentration check. If the check fails, the spell is wasted, but the attacks still take the penalty. You can choose to cast the spell first or make the weapon attacks first, but if you have more than one attack, you cannot cast the spell between weapon attacks.</description>
 			<type>MAGUSCLASSFEATURES.SPECIALATTACK.EXTRAORDINARY</type>
 			<associated></associated>
 			<count>0</count>
@@ -3033,7 +3033,7 @@
 	<traits>
 		<trait>
 			<name>Magical Lineage (Shocking Grasp)</name>
-			<description>One of your parents was a gifted spellcaster who not only used metamagic often, but developed many magical items and perhaps even a new spell or two--and you have inherited a fragment of this greatness. When you apply metamagic feats to Shocking Grasp, treat its actual level as 1 lower for determining the spell&#39;s final adjusted level.</description>
+			<description>One of your parents was a gifted spellcaster who not only used metamagic often, but developed many magical org.gary.items and perhaps even a new spell or two--and you have inherited a fragment of this greatness. When you apply metamagic feats to Shocking Grasp, treat its actual level as 1 lower for determining the spell&#39;s final adjusted level.</description>
 			<source>Paizo Inc. - Advanced Player&#39;s Guide, p.329</source>
 		</trait>
 		<trait>
@@ -3548,7 +3548,7 @@
 						<concentration>+8</concentration>
 						<dc></dc>
 						<duration>40 minutes</duration>
-						<effect>You can decipher magical inscriptions on objects--books, scrolls, weapons, and the like--that would otherwise be unintelligible.</effect>
+						<effect>You can decipher magical inscriptions on objects--books, scrolls, org.gary.weapons, and the like--that would otherwise be unintelligible.</effect>
 						<target>You</target>
 						<saveinfo></saveinfo>
 						<school>
@@ -3565,7 +3565,7 @@
 							<sourceshort>CR</sourceshort>
 						</source>
 						<spell_resistance></spell_resistance>
-						<description>You can decipher magical inscriptions on objects--books, scrolls, weapons, and the like--that would otherwise be unintelligible.</description>
+						<description>You can decipher magical inscriptions on objects--books, scrolls, org.gary.weapons, and the like--that would otherwise be unintelligible.</description>
 						<bonusspell></bonusspell>
 				</spell>
 				<spell>
@@ -4675,7 +4675,7 @@
 							<concentration>+8</concentration>
 							<dc></dc>
 							<duration>40 minutes</duration>
-							<effect>You can decipher magical inscriptions on objects--books, scrolls, weapons, and the like--that would otherwise be unintelligible.</effect>
+							<effect>You can decipher magical inscriptions on objects--books, scrolls, org.gary.weapons, and the like--that would otherwise be unintelligible.</effect>
 							<target>You</target>
 							<saveinfo></saveinfo>
 							<school>
@@ -4692,7 +4692,7 @@
 								<sourceshort>CR</sourceshort>
 							</source>
 							<spell_resistance></spell_resistance>
-							<description>You can decipher magical inscriptions on objects--books, scrolls, weapons, and the like--that would otherwise be unintelligible.</description>
+							<description>You can decipher magical inscriptions on objects--books, scrolls, org.gary.weapons, and the like--that would otherwise be unintelligible.</description>
 							<bonusspell></bonusspell>
 						</spell>
 					<spell>
