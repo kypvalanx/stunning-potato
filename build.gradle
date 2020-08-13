@@ -15,7 +15,7 @@ compileJava {
 addCucumberSuite 'cucumberTest'
 
 application {
-    mainClassName = 'Main'
+    mainClassName = 'org.gary.Main'
 }
 
 tasks.withType(JavaCompile) {
