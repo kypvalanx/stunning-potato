@@ -30,6 +30,7 @@ import org.gary.weapons.WeaponsBehavior;
 
 public class CoreListener extends ListenerAdapter {
     private final GroupBehavior primaryContext;
+    private final HistoricalCallBehavior historicalCallBehavior;
 
     public CoreListener() {
 
@@ -45,21 +46,23 @@ public class CoreListener extends ListenerAdapter {
                         }
                     }
                 })
-                .add(new String[]{"org/gary/rebellion", "!r"}, RebellionBehaviors.getRebellionBehavior())
+                .add(new String[]{"rebellion", "!r"}, RebellionBehaviors.getRebellionBehavior())
                 .add(new String[]{"roll", "/roll", "!roll"}, DieParser.getRollBehavior())
                 .add(new String[]{"var"}, Variables.getVarBehavior())
                 .add(new String[]{"pvar"}, Variables.getPVarBehavior())
                 .add(new String[]{"dc"}, CheckDC.getDCBehavior())
-                .add(new String[]{"rule", "org/gary/rules"}, new RulesLookupBehavior())
+                .add(new String[]{"rule", "rules"}, new RulesLookupBehavior())
                 .add(new String[]{"item", "!i"}, new ItemBehavior())
                 .add(new String[]{"weapon", "!w"}, new WeaponsBehavior())
-                .add(new String[]{"org/gary/pack", "!p"}, new PackBehavior())
-                .add(new String[]{"org/gary/armor", "!a"}, new ArmorBehavior())
-                .add(new String[]{"org/gary/table"}, RollTableDelegate.getBehavior())
+                .add(new String[]{"pack", "!p"}, new PackBehavior())
+                .add(new String[]{"armor", "!a"}, new ArmorBehavior())
+                .add(new String[]{"table"}, RollTableDelegate.getBehavior())
                 .add(new String[]{"hey gary"}, GaryPersonality.getGaryGreet());
 
+        historicalCallBehavior = new HistoricalCallBehavior(primaryContext);
         primaryContext
-                .add(new String[]{"help"}, new NachoHelpBehavior(primaryContext));
+                .add(new String[]{"help"}, new NachoHelpBehavior(primaryContext))
+                .add(new String[]{"last", "again", "repeat"}, historicalCallBehavior);
     }
 
     @Override
@@ -74,6 +77,7 @@ public class CoreListener extends ListenerAdapter {
 
         try {
             DeckList<String> message = getDeckListMessage(event);
+            historicalCallBehavior.store(event.getChannel(), message);
 
             if (event.getMessage().isMentioned(event.getJDA().getSelfUser(), Message.MentionType.USER)) {
                 channel = event.getAuthor().openPrivateChannel().complete();
